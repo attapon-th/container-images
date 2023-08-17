@@ -45,6 +45,9 @@ N8N_ENCRYPTION_KEY=randomkey-change-me
 ### Deploy
 
 > deploy file: [n8n-stack.yml](./n8n-stack.yml)
+> 
+
+
 ```shell
 docker stack deploy -c n8n-stack.yml n8n
 ```
