@@ -1,0 +1,143 @@
+# n8n use traefik reverse proxy
+version: "3.8"
+volumes:
+  postgressql_n8n:
+  n8n_data:
+  n8n_node:
+
+networks:
+  proxy:
+    external: true
+  n8n:
+
+x-n8n-label: &n8n-label # setup traefik
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.n8n.tls=true"
+    - "traefik.http.routers.n8n.rule=Host(`${N8N_HOST}`) && PathPrefix(`${N8N_PATH}`)"
+    - "traefik.http.routers.n8n.entryPoints=web,websecure"
+    - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+    # setup middlewares
+    - "traefik.http.routers.n8n.middlewares=n8n-stripprefix,n8n-headers"
+    - "traefik.http.middlewares.n8n-stripprefix.stripprefix.prefixes=${N8N_PATH}"
+    - "traefik.http.middlewares.n8n-headers.headers.STSSeconds=315360000"
+    - "traefik.http.middlewares.n8n-headers.headers.browserXSSFilter=true"
+    - "traefik.http.middlewares.n8n-headers.headers.contentTypeNosniff=true"
+    - "traefik.http.middlewares.n8n-headers.headers.forceSTSHeader=true"
+    - "traefik.http.middlewares.n8n-headers.headers.STSIncludeSubdomains=true"
+    - "traefik.http.middlewares.n8n-headers.headers.STSPreload=true"
+
+x-n8n-common: &n8n-common
+  image: n8nio/n8n:latest
+  working_dir: /home/node/data
+  volumes:
+    - n8n_node:/home/node/.n8n
+    - n8n_data:/home/node/data
+  networks:
+    - n8n
+  environment:
+    - TZ=Asia/Bangkok
+    - GENERIC_TIMEZONE=Asia/Bangkok
+
+    # setup config database connection
+    - DB_TYPE=postgresdb
+    - DB_POSTGRESDB_HOST=postgres-n8n
+    - DB_POSTGRESDB_PORT=5432
+    - DB_POSTGRESDB_DATABASE=n8n
+    - DB_POSTGRESDB_USER=n8n
+    - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+    ## http basic authentication
+    - N8N_BASIC_AUTH_ACTIVE=true
+    - N8N_BASIC_AUTH_USER=admin
+    - N8N_BASIC_AUTH_PASSWORD=admin
+    - N8N_PORT=5678
+    - NODE_ENV=production
+
+    # add path prefixe
+    ## please change this value
+    - N8N_PROTOCOL=${N8N_PROTOCOL}
+    - N8N_HOST=${N8N_HOST}
+    - N8N_PATH=${N8N_PATH}/
+    - WEBHOOK_URL=${WEBHOOK_URL}
+    - N8N_LOG_LEVEL=error
+    # setup queue worker
+    - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+    - EXECUTIONS_TIMEOUT=3600
+    - EXECUTIONS_TIMEOUT_MAX=7200
+    - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+    - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+    - EXECUTIONS_DATA_SAVE_ON_PROGRESS=false
+    - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=false
+    - EXECUTIONS_DATA_PRUNE=true
+    - EXECUTIONS_DATA_MAX_AGE=336
+    - EXECUTIONS_PROCESS=main
+    - EXECUTIONS_MODE=queue
+    - QUEUE_BULL_REDIS_HOST=redis-n8n
+    - QUEUE_BULL_REDIS_PORT=6379
+    - QUEUE_BULL_REDIS_DB=0
+    # - QUEUE_BULL_REDIS_USERNAME
+    # - QUEUE_BULL_REDIS_PASSWORD
+
+    # optional
+    - N8N_TEMPLATES_ENABLED=false
+    - N8N_PAYLOAD_SIZE_MAX=100 # 100MB
+    # Email settings
+    # - N8N_EMAIL_MODE=smtp
+    # - N8N_SMTP_HOST=smtp
+    # - N8N_SMTP_PORT=smtp
+    # - N8N_SMTP_USER=smtp
+    # - N8N_SMTP_PASS=smtp
+    # - N8N_SMTP_SENDER=indev@moph.mail.go.th
+    # - N8N_SMTP_SSL=true
+
+services:
+  postgres-n8n:
+    image: bitnami/postgresql:15
+    hostname: postgres-n8n
+    environment:
+      - TZ=Asia/Bangkok
+      - POSTGRESQL_USERNAME=n8n # default
+      - POSTGRESQL_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRESQL_DATABASE=n8n
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - postgressql_n8n:/bitnami/postgresql
+    networks:
+      - n8n
+
+  redis-n8n:
+    image: redis
+    hostname: redis-n8n
+    deploy:
+      mode: replicated
+      replicas: 1
+    networks:
+      - n8n
+
+  n8n:
+    <<: *n8n-common
+    hostname: n8n
+    # command: start
+    networks:
+      - n8n
+      - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      <<: *n8n-label
+
+  n8n-worker:
+    <<: *n8n-common
+    command: worker
+    deploy:
+      mode: replicated
+      replicas: 2
+
+  n8n-webhook:
+    <<: *n8n-common
+    command: webhook
+    deploy:
+      mode: replicated
+      replicas: 1

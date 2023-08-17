@@ -1,0 +1,72 @@
+version: "3"
+
+services:
+  jupyterhub:
+    image: jupyterhub-keycloak:latest
+    hostname: jupyterhub
+
+    ports:
+      - 8000:8000
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - jupyterhub_data:/data
+
+    environment:
+      DOCKER_NETWORK_NAME: jupyterhub_swarm_network # required (docker network name)
+      # JupyterHub settings
+      JUPYTERHUB_CRYPT_KEY: somecryptkey # required (random: openssl rand -base64 32)
+      JUPYTERHUB_HOST: http://localhost:8000 # Default: http://localhost:8000
+      JUPYTERHUB_BASE_URL: /myhub/ # Default: /
+
+      ## keycloak settings
+      KEYCLOAK_OPENID_CONFIG_URL: https://localhost:8080/auth/realms/dev/.well-known/openid-configuration # required (openid configuration url)
+
+      # OAuth2 settings
+      OAUTH2_CLIENT_ID: my-jupyter # required
+      OAUTH2_CLIENT_SECRET: secretkey # required
+
+      ## not set if you not modify keycloak settings
+      # OAUTH2_CALLBACK_URL: # Default: ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}/oauth_callback
+      # OAUTH2_LOGOUT_REDIRECT_URL: # Default: logout to keycloak and redirect to ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}
+
+      OAUTH2_SCOPE: openid,profile,roles # Default: openid,profile,email
+      OAUTH2_USER_CLAIM: preferred_username # Default: preferred_username
+      # OAUTH2_CLAIM_GROUPS_KEY: # Default: resource_access.${OAUTH2_CLIENT_ID}.roles (get with client roles)
+      OAUTH2_ALLOWED_GROUPS: jupyter-user # User Group can use jupterhub.  Default: user (support multi groups, ex: user,staff)
+      OAUTH2_ADMIN_GROUPS: jupyter-admin # Admin Group can manage and controler jupyterhub.  Default: admin (support multi groups, ex: admin,staff)
+      OAUTH2_VALIDATE_SERVER_CERT: 0 # validate oauth2 server certificate. Default: 1
+
+      # Docker image settings
+      DOCKER_NOTEBOOK_IMAGE: jupyterlab:latest # Default: jupyter/scipy-notebook:latest
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan
+      DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh
+
+      SPAWNER_CPU_LIMIT: 2 # Default: 1
+      SPAWNER_MEM_LIMIT: 5G # Default: 1G
+      JUPYTERHUB_IDLE_CULLER_TIMEOUT: 1800 # 3600 = 1 hour. Default: 3600
+
+    networks:
+      - jupyterhub_swarm_network
+
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      # if use traefik reverse proxy
+      # labels:
+      #   - "traefik.enable=true"
+      #   - "traefik.http.routers.__ChangeMe__.tls=true"
+      #   - "traefik.http.routers.__ChangeMe__.rule=Host(`localhost`) && PathPrefix(`/myhub`)"
+      #   - "traefik.http.routers.__ChangeMe__.entryPoints=web,websecure"
+      #   - "traefik.http.services.__ChangeMe__.loadbalancer.server.port=8000"
+networks:
+  jupyterhub_swarm_network:
+    driver: overlay
+    external: true
+    attachable: true
+
+volumes:
+  jupyterhub_data:
+    external: true
