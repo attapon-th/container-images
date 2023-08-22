@@ -3,9 +3,9 @@
 version: "3"
 
 vars:
-  IMAGE_REGISTRY: "indev.moph.go.th:5000/airflow"
-  IMAGE_VERSION: "2.7.0-python3.11"
+  IMAGE_REGISTRY: "indev.moph.go.th:5000"
   AIRFLOW_VERSION: 2.7.0-python3.11
+  FILEBROWSER_VERSION: latest
 
 tasks:
   default:
@@ -13,6 +13,26 @@ tasks:
       - task --list-all
     silent: true
 
-  docker-build:
+  up:
     cmds:
-      - docker build --build-arg="AIRFLOW_VERSION={{.AIRFLOW_VERSION}}" -t {{.IMAGE_REGISTRY}}:{{.IMAGE_VERSION}} .
+      - docker compose up -d
+      # - docker compose --profile flower up -d
+
+  logs:
+    cmds:
+      - docker compose logs -f
+
+  down:
+    cmds:
+      - docker compose down
+      - docker compose --profile flower down
+
+  build:
+    - task airflow-build filebrowser-build
+
+  airflow-build:
+    cmds:
+      - docker build --build-arg="AIRFLOW_VERSION={{.AIRFLOW_VERSION}}" -t "{{.IMAGE_REGISTRY}}/airflow:{{.AIRFLOW_VERSION}}" .
+
+  filebrowser-build:
+    - docker build --build-arg="FILEBROWSER_VERSION={{.FILEBROWSER_VERSION}}" -f Dockerfile-filebrowser -t {{.IMAGE_REGISTRY}}/airflow-filebrowser:{{.FILEBROWSER_VERSION}} .

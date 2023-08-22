@@ -1,0 +1,6 @@
+ARG FILEBROWSER_VERSION=latest
+FROM filebrowser/filebrowser:latest
+
+ENV TZ=Asia/Bangkok PUID=50000 PGID=0
+
+COPY ./filebrowser/filebrowser.json /.filebrowser.json
