@@ -1,0 +1,18 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  IMAGE_REGISTRY: "indev.moph.go.th:5000/airflow"
+  IMAGE_VERSION: "2.7.0-python3.11"
+  AIRFLOW_VERSION: 2.7.0-python3.11
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+
+  docker-build:
+    cmds:
+      - docker build --build-arg="AIRFLOW_VERSION={{.AIRFLOW_VERSION}}" -t {{.IMAGE_REGISTRY}}:{{.IMAGE_VERSION}} .
