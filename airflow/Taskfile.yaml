@@ -26,6 +26,9 @@ tasks:
     cmds:
       - docker compose down
       - docker compose --profile flower down
+  push:
+    - docker push "{{.IMAGE_REGISTRY}}/airflow:{{.AIRFLOW_VERSION}}"
+    - docker push "{{.IMAGE_REGISTRY}}/airflow-filebrowser:{{.FILEBROWSER_VERSION}}"
 
   build:
     - task airflow-build filebrowser-build

@@ -72,6 +72,8 @@ x-airflow-common: &airflow-common
     AIRFLOW__WEBSERVER__BASE_URL: ${BASE_URL:-http://localhost:8080}
     AIRFLOW__CELERY__FLOWER_URL_PREFIX: ${FLOWER_URL_PREFIX:-/}
 
+    AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: 30 # refresh dag list every 30 seconds (default: 600 seconds)
+
   volumes:
     - airflow-volume:/opt/airflow
 
@@ -99,12 +101,18 @@ volumes:
 services:
   treafik:
     image: traefik:v2.5
+    environment:
+      TZ: Asia/Bangkok
     command:
       - --api=false
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
+      - --serverstransport.insecureskipverify=true
+      - --providers.docker.network=airflow-net
+    labels:
+      - "traefik.enable=true"
     ports:
       - "8080:80"
       # - "443:443"
