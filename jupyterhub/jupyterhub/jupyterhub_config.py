@@ -89,12 +89,20 @@ c.DockerSpawner.host_ip = "0.0.0.0"
 notebook_dir = os.environ.get("DOCKER_NOTEBOOK_DIR", "/home/jovyan/")
 c.DockerSpawner.notebook_dir = notebook_dir
 
+share_dir = os.environ.get("DOCKER_SHARE_DIR", "")
+
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
 c.DockerSpawner.volumes = {"jupyterhub-user-{username}": notebook_dir}
 
+if share_dir != "":
+    if not os.path.exists(share_dir):
+        os.makedirs(share_dir)
+        share_dir = os.path.realpath(share_dir)
+    c.DockerSpawner.volumes["jupyterhub-share"] = share_dir
+
 # Remove containers once they are stopped
-c.DockerSpawner.remove = True
+c.DockerSpawner.remove = False
 
 # For debugging arguments passed to spawned containers
 c.DockerSpawner.debug = False
@@ -113,42 +121,42 @@ c.DockerSpawner.mem_limit = os.environ.get("DOCKER_MEM_LIMIT", "2G")
 
 
 
+if os.environ.get("JUPYTERHUB_IDLE_CULLER_ENABLED", "1").lower() in ("true", "yes", "1"):
+    c.JupyterHub.load_roles = [
+        {
+            "name": "server-rights",
+            "scopes": [
+                "list:users",
+                "read:users:activity",
+                "read:servers",
+                "delete:servers",
+                "admin:users", # if using --cull-users
+            ]
+        },
+        {
+            "name": "jupyterhub-idle-culler-role",
+            "scopes": [
+                "list:users",
+                "read:users:activity",
+                "read:servers",
+                "delete:servers",
+                "admin:users", # if using --cull-users
+            ],
+            # assignment of role's permissions to:
+            "services": ["jupyterhub-idle-culler-service"],
+        }
+    ]
 
-c.JupyterHub.load_roles = [
-    {
-        "name": "server-rights",
-        "scopes": [
-            "list:users",
-            "read:users:activity",
-            "read:servers",
-            "delete:servers",
-            "admin:users", # if using --cull-users
-        ]
-    },
-    {
-        "name": "jupyterhub-idle-culler-role",
-        "scopes": [
-            "list:users",
-            "read:users:activity",
-            "read:servers",
-            "delete:servers",
-        "admin:users", # if using --cull-users
-        ],
-        # assignment of role's permissions to:
-        "services": ["jupyterhub-idle-culler-service"],
-    }
-]
 
 
-
-c.JupyterHub.services = [
-    {
-        "name": "jupyterhub-idle-culler-service",
-        "command": [
-            sys.executable,
-            "-m", "jupyterhub_idle_culler",
-            "--timeout={}".format(os.environ.get("JUPYTERHUB_IDLE_CULLER_TIMEOUT", '3600')), #1HR
-        ],
-        # "admin": True,
-    }
-]
+    c.JupyterHub.services = [
+        {
+            "name": "jupyterhub-idle-culler-service",
+            "command": [
+                sys.executable,
+                "-m", "jupyterhub_idle_culler",
+                "--timeout={}".format(os.environ.get("JUPYTERHUB_IDLE_CULLER_TIMEOUT", '3600')), #1HR
+            ],
+            # "admin": True,
+        }
+    ]

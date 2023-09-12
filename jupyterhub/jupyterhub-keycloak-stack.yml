@@ -19,16 +19,16 @@ services:
       JUPYTERHUB_HOST: http://localhost:8000 # Default: http://localhost:8000
       JUPYTERHUB_BASE_URL: /myhub/ # Default: /
 
+      ## callback keycloak settings
+      OAUTH2_CALLBACK_URL: http://localhost:8000/myhub/oauth_callback # Default: ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}/oauth_callback
+      OAUTH2_LOGOUT_REDIRECT_URL: http://localhost:8000/myhub/ # Default: logout to keycloak and redirect to ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}
+
       ## keycloak settings
       KEYCLOAK_OPENID_CONFIG_URL: https://localhost:8080/auth/realms/dev/.well-known/openid-configuration # required (openid configuration url)
 
       # OAuth2 settings
       OAUTH2_CLIENT_ID: my-jupyter # required
       OAUTH2_CLIENT_SECRET: secretkey # required
-
-      ## not set if you not modify keycloak settings
-      # OAUTH2_CALLBACK_URL: # Default: ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}/oauth_callback
-      # OAUTH2_LOGOUT_REDIRECT_URL: # Default: logout to keycloak and redirect to ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}
 
       OAUTH2_SCOPE: openid,profile,roles # Default: openid,profile,email
       OAUTH2_USER_CLAIM: preferred_username # Default: preferred_username
@@ -39,11 +39,13 @@ services:
 
       # Docker image settings
       DOCKER_NOTEBOOK_IMAGE: jupyterlab:latest # Default: jupyter/scipy-notebook:latest
-      DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan
+      DOCKER_NOTEBOOK_DIR: /home/jovyan # Default: /home/jovyan
+      DOCKER_SHARE_DIR: /var/share # Default: None (not mount)
       DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh
 
       SPAWNER_CPU_LIMIT: 2 # Default: 1
       SPAWNER_MEM_LIMIT: 5G # Default: 1G
+      JUPYTERHUB_IDLE_CULLER_ENABLED: 1 # Default: 1
       JUPYTERHUB_IDLE_CULLER_TIMEOUT: 1800 # 3600 = 1 hour. Default: 3600
 
     networks:
