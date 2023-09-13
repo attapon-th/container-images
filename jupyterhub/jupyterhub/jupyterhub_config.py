@@ -99,7 +99,10 @@ if share_dir != "":
     if not os.path.exists(share_dir):
         os.makedirs(share_dir)
         share_dir = os.path.realpath(share_dir)
+        # os.chown(share_dir, 1000, 100)
+        os.chmod(share_dir, 0o777)
     c.DockerSpawner.volumes["jupyterhub-share"] = share_dir
+
 
 # Remove containers once they are stopped
 c.DockerSpawner.remove = False
