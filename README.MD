@@ -10,8 +10,8 @@
 ## Create User In Image
 
 ```dockerfile
-LABEL image.authors="Attapon.TH <attapon.4work@gmail.com>"
+LABEL maintainer="Attapon.TH <attapon.4work@gmail.com>"
 
-ENV UNAME=attapon
-RUN groupadd --gid 1000 $UNAME && useradd --uid 1000 --gid $UNAME --shell /bin/sh --create-home $UNAME
+ARG UNAME=attapon
+RUN useradd --no-log-init --create-home --shell /bin/bash --uid "1000" --no-user-group "${UNAME}"
 ```
