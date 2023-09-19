@@ -39,8 +39,8 @@ services:
 
       # Docker image settings
       DOCKER_NOTEBOOK_IMAGE: jupyterlab:latest # Default: jupyter/scipy-notebook:latest
-      DOCKER_NOTEBOOK_DIR: /home/jovyan # Default: /home/jovyan
-      DOCKER_SHARE_DIR: /var/share # Default: None (not mount) ** if mount share dir you need to set permission directory to chmod 777 or chown 1000:100
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan
+      DOCKER_SHARE_DIR: /home/jovyan/share # Default: None (not mount) ** if mount share dir you need to set permission directory to chmod 777 or chown 1000:100
       DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh
 
       SPAWNER_CPU_LIMIT: 2 # Default: 1
