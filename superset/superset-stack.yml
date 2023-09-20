@@ -1,0 +1,113 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+x-superset-image: &superset-image ${SUPERSET_IMAGE}:${SUPERSET_VERSION}
+x-superset-volumes: &superset-volumes # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
+  - superset_home:/app/superset_home
+x-superset-network: &superset-network
+  - proxy
+  - superset
+
+x-superset-environment: &superset-environment
+  - TZ=Asia/Bangkok
+  - DATABASE_DB=superset
+  - DATABASE_HOST=superset_db
+  - DATABASE_PASSWORD=superset
+  - DATABASE_USER=superset
+  - DATABASE_PORT=5432
+  - DATABASE_DIALECT=postgresql
+
+  - POSTGRES_DB=superset
+  - POSTGRES_USER=superset
+  - POSTGRES_PASSWORD=superset
+  - PYTHONPATH=/app/pythonpath
+  - REDIS_HOST=superset_redis
+  - REDIS_PORT=6379
+  #  superset environment
+  - SUPERSET_ENV=production
+  - SUPERSET_LOAD_EXAMPLES=false
+  # $ openssl rand -base64 32
+  - SUPERSET_SECRET_KEY=_change_me_if_you_can_
+  - SUPERSET_PORT=8088
+  - MAPBOX_API_KEY=''
+
+version: "3.8"
+services:
+  redis:
+    image: redis:7
+    hostname: superset_redis
+    environment: *superset-environment
+    networks: *superset-network
+    volumes:
+      - redis:/data
+
+  db:
+    image: ${SUPERSET_IMAGE}_postgresql:${SUPERSET_VERSION}
+    hostname: superset_db
+    environment: *superset-environment
+    networks: *superset-network
+    volumes:
+      - db_home:/var/lib/postgresql/data
+      # - ./superset/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+  superset:
+    image: *superset-image
+    hostname: superset_app
+    environment: *superset-environment
+    networks: *superset-network
+    volumes: *superset-volumes
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.superset.tls=true
+        - traefik.http.routers.superset.entryPoints=web,websecure
+        - traefik.http.routers.superset.rule=Host(`localhost`)
+        - traefik.http.services.superset.loadbalancer.server.port=8088
+    # ports:
+    #   - 8088:8088
+
+  superset-worker:
+    image: *superset-image
+    environment: *superset-environment
+    networks: *superset-network
+    command: ["/app/docker/docker-bootstrap.sh", "worker"]
+    volumes: *superset-volumes
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME"]
+
+  superset-worker-beat:
+    image: *superset-image
+    environment: *superset-environment
+    networks: *superset-network
+    command: ["/app/docker/docker-bootstrap.sh", "beat"]
+    volumes: *superset-volumes
+    healthcheck:
+      disable: true
+
+volumes:
+  superset_home:
+    external: false
+  db_home:
+    external: false
+  redis:
+    external: false
+networks:
+  proxy:
+    external: true
+  superset:
+    external: false
