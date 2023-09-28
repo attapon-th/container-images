@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  keycloak-server:
+    image: keycloak:latest
+    hostname: keycloak-server
+    environment:
+      TZ: Asia/Bangkok
+      KC_DB_URL: "jdbc:postgresql://postgres_keycloak:5432/keycloak?characterEncoding=UTF-8"
+      KC_DB: postgres
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_HOSTNAME_URL: https://${HOSTNAME}${PREFIX_PATH}
+      KC_HTTP_RELATIVE_PATH: ${PREFIX_PATH}
+    command:
+      - start
+      - --proxy=edge
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.keycloak.tls=true"
+        - "traefik.http.routers.keycloak.entrypoints=websecure"
+        - "traefik.http.routers.keycloak.rule=Host(`${HOSTNAME}`) && PathPrefix(`${PREFIX_PATH}`)"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    networks:
+      - keycloak
+      - proxy
+
+  postgres_keycloak:
+    image: "postgres:13-alpine"
+    hostname: postgres_keycloak
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/data
+    environment:
+      TZ: Asia/Bangkok
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: keycloak
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - keycloak
+
+networks:
+  proxy:
+    external: true
+  keycloak:
+volumes:
+  postgres_keycloak_data:
+    external: true
