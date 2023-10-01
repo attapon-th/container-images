@@ -10,8 +10,9 @@ services:
       KC_DB: postgres
       KC_DB_USERNAME: ${DB_USERNAME}
       KC_DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${ADMIN_PASS:-admin}
       KC_HOSTNAME_URL: https://${HOSTNAME}${PREFIX_PATH}
-      KC_HTTP_RELATIVE_PATH: ${PREFIX_PATH}
     command:
       - start
       - --proxy=edge
