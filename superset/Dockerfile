@@ -19,8 +19,7 @@ RUN pip install -U --no-cache-dir pip \
 USER superset
 
 COPY --chown=superset:superset --chmod=755 ./superset/docker/*.sh /app/docker/
-COPY --chown=superset:superset --chmod=755 ./docker/superset_config.py /app/pythonpath/superset_config.py
-COPY --chown=superset:superset --chmod=755 ./docker/keycloack_security_manager.py /app/pythonpath/keycloack_security_manager.py
+COPY --chown=superset:superset --chmod=755 ./docker/*.py /app/pythonpath/
 
 
 CMD ["/app/docker/docker-ci.sh"]
