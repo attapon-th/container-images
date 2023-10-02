@@ -1,12 +1,23 @@
-version: "3"
+# follow environment variables
+# file: example.env
+#  -------- Env ----------
+# HTTPS=http
+# DOMAIN=localhost
+# PREFIX=/jupyterhub
+# CLIENT_ID=
+# CLIENT_SECRET=
+# CRYPT_KEY=changeme
+# OPENID_URL=http://localhost:8080/auth/realms/master/.well-known/openid-configuration
+#  -------- END Env ----------
 
+version: "3"
 services:
   jupyterhub:
     image: jupyterhub-keycloak:latest
     hostname: jupyterhub
 
-    ports:
-      - 8000:8000
+    # ports:
+    #   - 8000:8000
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
@@ -15,20 +26,20 @@ services:
     environment:
       DOCKER_NETWORK_NAME: jupyterhub_swarm_network # required (docker network name)
       # JupyterHub settings
-      JUPYTERHUB_CRYPT_KEY: somecryptkey # required (random: openssl rand -base64 32)
-      JUPYTERHUB_HOST: http://localhost:8000 # Default: http://localhost:8000
-      JUPYTERHUB_BASE_URL: /myhub/ # Default: /
+      JUPYTERHUB_CRYPT_KEY: ${CRYPT_KEY} # required (random: openssl rand -base64 32)
+      JUPYTERHUB_HOST: ${HTTPS:-http}://${DOMAIN} # Default: http://localhost:8000
+      JUPYTERHUB_BASE_URL: ${PREFIX}/ # Default: /
 
       ## callback keycloak settings
-      OAUTH2_CALLBACK_URL: http://localhost:8000/myhub/oauth_callback # Default: ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}/oauth_callback
-      # OAUTH2_LOGOUT_REDIRECT_URL: http://localhost:8000/myhub/ # (set is full logout url) Default: logout to keycloak and redirect to ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}
+      OAUTH2_CALLBACK_URL: ${HTTPS:-http}://${DOMAIN}${PREFIX}/oauth_callback # Default: ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}/oauth_callback
+      OAUTH2_LOGOUT_REDIRECT_URL: ${HTTPS:-http}://cmdac.moph.go.th/jupyterhub/ # (set is full logout url) Default: logout to keycloak and redirect to ${JUPYTERHUB_HOST}/${JUPYTERHUB_BASE_URL}
 
       ## keycloak settings
-      KEYCLOAK_OPENID_CONFIG_URL: https://localhost:8080/auth/realms/dev/.well-known/openid-configuration # required (openid configuration url)
+      KEYCLOAK_OPENID_CONFIG_URL: ${OPENID_URL} # required (openid configuration url)
 
       # OAuth2 settings
-      OAUTH2_CLIENT_ID: my-jupyter # required
-      OAUTH2_CLIENT_SECRET: secretkey # required
+      OAUTH2_CLIENT_ID: ${CLIENT_ID} # required
+      OAUTH2_CLIENT_SECRET: ${CLIENT_SECRET} # required
 
       OAUTH2_SCOPE: openid,profile,roles # Default: openid,profile,email
       OAUTH2_USER_CLAIM: preferred_username # Default: preferred_username
@@ -43,10 +54,10 @@ services:
       DOCKER_SHARE_DIR: /home/jovyan/share # Default: None (not mount) ** if mount share dir you need to set permission directory to chmod 777 or chown 1000:100
       DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh
 
-      SPAWNER_CPU_LIMIT: 2 # Default: 2
-      SPAWNER_MEM_LIMIT: 5G # Default: 4G
+      SPAWNER_CPU_LIMIT: 4 # Default: 2
+      SPAWNER_MEM_LIMIT: 12G # Default: 4G
       JUPYTERHUB_IDLE_CULLER_ENABLED: 1 # Default: 1
-      JUPYTERHUB_IDLE_CULLER_TIMEOUT: 1800 # 3600 = 1 hour. Default: 3600
+      JUPYTERHUB_IDLE_CULLER_TIMEOUT: 36000 # 3600 = 1 hour. Default: 3600
 
     networks:
       - jupyterhub_swarm_network
@@ -57,16 +68,18 @@ services:
         constraints:
           - node.role == manager
       # if use traefik reverse proxy
-      # labels:
-      #   - "traefik.enable=true"
-      #   - "traefik.http.routers.__ChangeMe__.tls=true"
-      #   - "traefik.http.routers.__ChangeMe__.rule=Host(`localhost`) && PathPrefix(`/myhub`)"
-      #   - "traefik.http.routers.__ChangeMe__.entryPoints=web,websecure"
-      #   - "traefik.http.services.__ChangeMe__.loadbalancer.server.port=8000"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jupyterhub.tls=true"
+        - "traefik.http.routers.jupyterhub.rule=Host(`${DOMAIN}`) && PathPrefix(`${PREFIX}`)"
+        - "traefik.http.routers.jupyterhub.entryPoints=web,websecure"
+        - "traefik.http.services.jupyterhub.loadbalancer.server.port=8000"
 networks:
   # create network first
   # `docker network create --driver=overlay --attachable jupyterhub_swarm_network`
-  jupyterhub_swarm_network:
+  jupyterhub_network:
+    external: true
+  proxy: # if use reverse proxy
     external: true
 
 volumes:
