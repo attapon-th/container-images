@@ -6,7 +6,7 @@
 # PREFIX=/jupyterhub
 # CLIENT_ID=
 # CLIENT_SECRET=
-# CRYPT_KEY=changeme
+# CRYPT_KEY=changeme # (example random: openssl rand -base64 32)
 # OPENID_URL=http://localhost:8080/auth/realms/master/.well-known/openid-configuration
 #  -------- END Env ----------
 
