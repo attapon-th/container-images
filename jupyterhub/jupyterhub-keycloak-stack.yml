@@ -39,12 +39,12 @@ services:
 
       # Docker image settings
       DOCKER_NOTEBOOK_IMAGE: jupyterlab:latest # Default: jupyter/scipy-notebook:latest
-      DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan/work
       DOCKER_SHARE_DIR: /home/jovyan/share # Default: None (not mount) ** if mount share dir you need to set permission directory to chmod 777 or chown 1000:100
       DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh
 
-      SPAWNER_CPU_LIMIT: 2 # Default: 1
-      SPAWNER_MEM_LIMIT: 5G # Default: 1G
+      SPAWNER_CPU_LIMIT: 2 # Default: 2
+      SPAWNER_MEM_LIMIT: 5G # Default: 4G
       JUPYTERHUB_IDLE_CULLER_ENABLED: 1 # Default: 1
       JUPYTERHUB_IDLE_CULLER_TIMEOUT: 1800 # 3600 = 1 hour. Default: 3600
 
@@ -64,11 +64,10 @@ services:
       #   - "traefik.http.routers.__ChangeMe__.entryPoints=web,websecure"
       #   - "traefik.http.services.__ChangeMe__.loadbalancer.server.port=8000"
 networks:
+  # create network first
+  # `docker network create --driver=overlay --attachable jupyterhub_swarm_network`
   jupyterhub_swarm_network:
-    driver: overlay
     external: true
-    attachable: true
 
 volumes:
   jupyterhub_data:
-    external: true

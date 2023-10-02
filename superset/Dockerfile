@@ -11,14 +11,16 @@ ENV TZ=Asia/Bangkok \
 # Switching to root to install the required packages
 USER root
 # Example: installing the MySQL driver to connect to the metadata database
-# if you prefer Postgres, you may want to use `psycopg2-binary` instead
+COPY ./docker/requirements.txt /requirements.txt
+
 RUN pip install -U --no-cache-dir pip \
-    pymysql psycopg2-binary \
-    clickhouse-connect sqlalchemy-vertica-python
+    &  pip install  --no-cache-dir -r /requirements.txt
 
 USER superset
 
 COPY --chown=superset:superset --chmod=755 ./superset/docker/*.sh /app/docker/
-COPY --chown=superset:superset --chmod=755 ./superset_config.py /app/pythonpath/superset_config.py
+COPY --chown=superset:superset --chmod=755 ./docker/superset_config.py /app/pythonpath/superset_config.py
+COPY --chown=superset:superset --chmod=755 ./docker/keycloack_security_manager.py /app/pythonpath/keycloack_security_manager.py
+
 
 CMD ["/app/docker/docker-ci.sh"]

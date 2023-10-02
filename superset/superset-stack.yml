@@ -23,6 +23,10 @@ x-superset-network: &superset-network
 
 x-superset-environment: &superset-environment
   - TZ=Asia/Bangkok
+  # Keycloak OAUTH2
+  - KEYCLOAK_OPENID_CONFIG_URL=
+  - KEYCLOAK_CLIENT_ID=
+  - KEYCLOAK_CLIENT_SECRET=
   - DATABASE_DB=superset
   - DATABASE_HOST=superset_db
   - DATABASE_PASSWORD=superset
@@ -46,23 +50,6 @@ x-superset-environment: &superset-environment
 
 version: "3.8"
 services:
-  redis:
-    image: redis:7
-    hostname: superset_redis
-    environment: *superset-environment
-    networks: *superset-network
-    volumes:
-      - redis:/data
-
-  db:
-    image: ${SUPERSET_IMAGE}_postgresql:${SUPERSET_VERSION}
-    hostname: superset_db
-    environment: *superset-environment
-    networks: *superset-network
-    volumes:
-      - db_home:/var/lib/postgresql/data
-      # - ./superset/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-
   superset:
     image: *superset-image
     hostname: superset_app
@@ -80,6 +67,23 @@ services:
         - traefik.http.services.superset.loadbalancer.server.port=8088
     # ports:
     #   - 8088:8088
+
+  redis:
+    image: redis:7
+    hostname: superset_redis
+    environment: *superset-environment
+    networks: *superset-network
+    volumes:
+      - redis:/data
+
+  db:
+    image: ${SUPERSET_IMAGE}_postgresql:${SUPERSET_VERSION}
+    hostname: superset_db
+    environment: *superset-environment
+    networks: *superset-network
+    volumes:
+      - db_home:/var/lib/postgresql/data
+      # - ./superset/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   superset-worker:
     image: *superset-image

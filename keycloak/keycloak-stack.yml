@@ -1,18 +1,27 @@
-version: "3.8"
+# ----- ENV -------
+# HOSTNAME=localhost
+# PREFIX_PATH=/auth
+# DB_USERNAME=keycloak
+# DB_PASSWORD=keycloak
+# DB_NAME=keycloak
+# ADMIN_USER=admin
+# ADMIN_PASS=admin
+# ------ END ENV -------
 
+version: "3.8"
 services:
   keycloak-server:
     image: keycloak:latest
     hostname: keycloak-server
     environment:
       TZ: Asia/Bangkok
-      KC_DB_URL: "jdbc:postgresql://postgres_keycloak:5432/keycloak?characterEncoding=UTF-8"
+      KC_DB_URL: "jdbc:postgresql://postgres_keycloak:5432/${DB_NAME:-keycloak}?characterEncoding=UTF-8"
       KC_DB: postgres
-      KC_DB_USERNAME: ${DB_USERNAME}
-      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_DB_USERNAME: ${DB_USERNAME:-keycloak}
+      KC_DB_PASSWORD: ${DB_PASSWORD:-keycloak}
       KEYCLOAK_ADMIN: ${ADMIN_USER:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${ADMIN_PASS:-admin}
-      KC_HOSTNAME_URL: https://${HOSTNAME}${PREFIX_PATH}
+      KC_HOSTNAME_URL: https://${DOMAIN}${PREFIX}
     command:
       - start
       - --proxy=edge
@@ -23,22 +32,22 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.keycloak.tls=true"
         - "traefik.http.routers.keycloak.entrypoints=websecure"
-        - "traefik.http.routers.keycloak.rule=Host(`${HOSTNAME}`) && PathPrefix(`${PREFIX_PATH}`)"
+        - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN}`) && PathPrefix(`${PREFIX}`)"
         - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
     networks:
       - keycloak
       - proxy
 
   postgres_keycloak:
-    image: "postgres:13-alpine"
+    image: "postgres:15"
     hostname: postgres_keycloak
     volumes:
       - postgres_keycloak_data:/var/lib/postgresql/data
     environment:
       TZ: Asia/Bangkok
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: keycloak
+      POSTGRES_USER: ${DB_USERNAME:-keycloak}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-keycloak}
+      POSTGRES_DB: ${DB_NAME:-keycloak}
     deploy:
       mode: replicated
       replicas: 1
@@ -51,6 +60,6 @@ networks:
   proxy:
     external: true
   keycloak:
+
 volumes:
-  postgres_keycloak_data:
-    external: true
+  postgres_data:

@@ -50,9 +50,10 @@ c.GenericOAuthenticator.logout_redirect_url = os.getenv("OAUTH2_LOGOUT_REDIRECT_
 
 # What we request about the user
 # ------------------------------
-c.GenericOAuthenticator.scope = os.environ.get("OAUTH2_SCOPE", "openid,roles,groups").split(",")
+c.GenericOAuthenticator.scope = os.environ.get("OAUTH2_SCOPE", "openid,roles").split(",")
 c.GenericOAuthenticator.username_claim = os.environ.get("OAUTH2_USER_CLAIM", "preferred_username")
-c.GenericOAuthenticator.claim_groups_key = os.environ.get("OAUTH2_CLAIM_GROUPS_KEY", "resource_access.{}.roles".format(os.environ['OAUTH2_CLIENT_ID']))
+# c.GenericOAuthenticator.claim_groups_key = os.environ.get("OAUTH2_CLAIM_GROUPS_KEY", "resource_access.{}.roles".format(os.environ['OAUTH2_CLIENT_ID']))
+c.GenericOAuthenticator.claim_groups_key = os.environ.get("OAUTH2_CLAIM_GROUPS_KEY", "roles")
 
 # Group whitelisting
 # -------------
@@ -86,10 +87,10 @@ c.DockerSpawner.host_ip = "0.0.0.0"
 # Most `jupyter/docker-stacks` *-notebook images run the Notebook server as
 # user `jovyan`, and set the notebook directory to `/home/jovyan/work`.
 # We follow the same convention.
-notebook_dir = os.environ.get("DOCKER_NOTEBOOK_DIR", "/home/jovyan/")
+notebook_dir = os.environ.get("DOCKER_NOTEBOOK_DIR", "/home/jovyan/work")
 c.DockerSpawner.notebook_dir = notebook_dir
 
-share_dir = os.environ.get("DOCKER_SHARE_DIR", "")
+share_dir = os.environ.get("DOCKER_SHARE_DIR", "/home/jovyan/share")
 
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
@@ -101,7 +102,7 @@ if share_dir != "":
         share_dir = os.path.realpath(share_dir)
         # os.chown(share_dir, 1000, 100)
         os.chmod(share_dir, 0o777)
-    c.DockerSpawner.volumes["jupyterhub-share"] = share_dir
+    c.DockerSpawner.volumes["jupyterhub-public-share"] = share_dir
 
 
 # Remove containers once they are stopped
@@ -117,9 +118,9 @@ c.JupyterHub.db_url = "sqlite:////data/jupyterhub.sqlite"
 
 # Resuource limits
 c.DockerSpawner.cpu_guarantee = 1
-c.DockerSpawner.mem_guarantee = "1G"
-c.DockerSpawner.cpu_limit = os.environ.get("DOCKER_CPU_LIMIT", 1)
-c.DockerSpawner.mem_limit = os.environ.get("DOCKER_MEM_LIMIT", "2G")
+c.DockerSpawner.mem_guarantee = "2G"
+c.DockerSpawner.cpu_limit = os.environ.get("DOCKER_CPU_LIMIT", 2)
+c.DockerSpawner.mem_limit = os.environ.get("DOCKER_MEM_LIMIT", "4G")
 
 
 

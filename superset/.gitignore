@@ -1,3 +1,4 @@
 .env
 *.yaml
-/superset
+/supersetf
+/client_secret.json

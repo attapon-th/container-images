@@ -8,9 +8,13 @@ services:
       TZ: "Asia/Bangkok"
     ports:
       - "5433:5433"
-      - "5444:5444"
+      # - "5444:5444"
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
     volumes:
       - type: volume
         source: vertica-data2
