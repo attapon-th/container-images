@@ -12,15 +12,14 @@
 # END ENV
 version: "3.8"
 services:
-  ${SERVICE_NAME}:
+  filebrowser:
     image: filebrowser/filebrowser:latest
     environment:
       TZ: Asia/Bangkok
       PUID: 1000
       PGID: 1000
       # user: admin:admin
-    # command: --baseurl "${BASE_URL}"
-    command: --baseurl "${BASE_URL:-/files}" --username "${USERNAME:-admin}" --password "${PASSWORD:-admin}"
+    command: --baseurl "${BASE_URL:-/files}"
     deploy:
       mode: replicated
       replicas: 1
@@ -28,7 +27,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.${SERVICE_NAME}.tls=true"
         - "traefik.http.routers.${SERVICE_NAME}.entrypoints=websecure"
-        - "traefik.http.routers.${SERVICE_NAME}.rule=Host(`${DOMAIN}) && PathPrefix(`${BASE_URL}`)"
+        - "traefik.http.routers.${SERVICE_NAME}.rule=Host(`${DOMAIN}`) && PathPrefix(`${BASE_URL}`)"
         - "traefik.http.services.${SERVICE_NAME}.loadbalancer.server.port=80"
     networks:
       - proxy
