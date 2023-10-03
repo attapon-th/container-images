@@ -2,9 +2,17 @@
 
 ## List
 
+- [x] [Keycloak](./keycloak/) 
 - [x] [Jupyter HUB](./juptyerhub/) 
 - [x] [N8N Workflow](./n8n/) 
-- [ ] [Airflow](./airflow/)
+- [x] [Airflow](./airflow/)
+- [x] [Superset](./superset/)
+
+---
+
+- [x] [minio.yaml](./minio-stack.yml)
+- [x] [filebrowser.yaml](./filebrowser-stack.yml)
+- [x] [docker-registry.yaml](./docker-registry.yml)
 
 
 ## Create User In Image
