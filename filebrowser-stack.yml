@@ -12,7 +12,7 @@
 # END ENV
 version: "3.8"
 services:
-  filebrowser:
+  ${SERVICE_NAME}:
     image: filebrowser/filebrowser:latest
     environment:
       TZ: Asia/Bangkok
