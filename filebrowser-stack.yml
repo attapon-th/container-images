@@ -1,0 +1,39 @@
+# ENV required
+# --------------------------------------------
+# DOMAIN=localhost
+# BASE_URL=
+# USERNAME=
+# PASSWORD=
+# VOLUME_MOUNT=
+# PUID=1000
+# PGID=1000
+# --------------------------------------------
+# END ENV
+version: "3.8"
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    environment:
+      TZ: Asia/Bangkok
+      PUID: 1000
+      PGID: 1000
+      # user: admin:admin
+    # command: --baseurl "${BASE_URL}"
+    command: --baseurl "${BASE_URL:-/files}" --username "${USERNAME:-admin}" --password "${PASSWORD:-admin}"
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.${TRAEFIK_ROUTER}.tls=true"
+        - "traefik.http.routers.${TRAEFIK_ROUTER}.entrypoints=websecure"
+        - "traefik.http.routers.${TRAEFIK_ROUTER}.rule=Host(`${DOMAIN}) && PathPrefix(`${BASE_URL}`)"
+        - "traefik.http.services.${TRAEFIK_ROUTER}.loadbalancer.server.port=80"
+    networks:
+      - proxy
+    volumes:
+      - ${PATH}:/srv
+
+networks:
+  proxy:
+    external: true
