@@ -32,8 +32,12 @@ services:
     networks:
       - proxy
     volumes:
+      - database:/database/filebrowser.db:z
       - ${VOLUME_MOUNT}:/srv
 
 networks:
   proxy:
     external: true
+
+volumes:
+  database:
