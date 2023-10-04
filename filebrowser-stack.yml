@@ -3,8 +3,6 @@
 # SERVICE_NAME=filebrowser1234
 # DOMAIN=localhost
 # BASE_URL=/filebrowser4321
-# USERNAME=admin
-# PASSWORD=admin
 # VOLUME_MOUNT=/home/user
 # PUID=1000
 # PGID=1000
@@ -16,8 +14,8 @@ services:
     image: filebrowser/filebrowser:latest
     environment:
       TZ: Asia/Bangkok
-      PUID: 1000
-      PGID: 1000
+      PUID: ${PUID}
+      PGID: ${PGID}
       # user: admin:admin
     command: --baseurl "${BASE_URL:-/files}"
     deploy:
