@@ -71,7 +71,7 @@ services:
     environment: *superset-environment
     networks: *superset-network
     volumes:
-      - db_home:/var/lib/postgresql/data
+      - db_home:/bitnami/postgresql
       # - ./superset/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   superset-worker:
