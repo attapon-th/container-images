@@ -18,7 +18,7 @@ RUN pip install -U --no-cache-dir pip \
 
 USER superset
 
-# COPY --chown=superset:superset --chmod=755 ./superset/docker/*.sh /app/docker/
+COPY --chown=superset:superset --chmod=755 ./docker/*.sh /app/docker/
 COPY --chown=superset:superset --chmod=755 ./docker/*.py /app/pythonpath/
 
 
