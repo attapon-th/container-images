@@ -7,7 +7,6 @@ from oauthenticator import generic
 c = get_config()  # noqa: F821
 
 
-
 # ===========================================================================
 #                            General Configuration
 # ===========================================================================
@@ -17,7 +16,6 @@ c.JupyterHub.base_url = jupyterhub_prefix
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = "0.0.0.0"
 c.JupyterHub.hub_port = 8080
-
 
 
 # ===========================================================================
@@ -41,12 +39,12 @@ c.GenericOAuthenticator.validate_server_cert = os.getenv("OAUTH2_VALIDATE_SERVER
 c.GenericOAuthenticator.authorize_url = wellknown.get("authorization_endpoint")
 c.GenericOAuthenticator.token_url = wellknown.get("token_endpoint")
 c.GenericOAuthenticator.userdata_url = wellknown.get("userinfo_endpoint")
-c.GenericOAuthenticator.oauth_callback_url = os.getenv("OAUTH2_CALLBACK_URL", None) or "{}/{}/{}".format(jupyterhub_host.removesuffix("/"), jupyterhub_prefix.strip("/") ,"oauth_callback")
+c.GenericOAuthenticator.oauth_callback_url = os.getenv("OAUTH2_CALLBACK_URL", None) or "{}/{}/{}".format(jupyterhub_host.removesuffix("/"), jupyterhub_prefix.strip("/"), "oauth_callback")
 c.GenericOAuthenticator.logout_redirect_url = os.getenv("OAUTH2_LOGOUT_REDIRECT_URL", None) or "{}?post_logout_redirect_uri={}&client_id={}".format(
     wellknown.get("end_session_endpoint"),
-    quote(urljoin(jupyterhub_host , c.JupyterHub.base_url)),
+    quote(urljoin(jupyterhub_host, c.JupyterHub.base_url)),
     quote(c.GenericOAuthenticator.client_id),
-    )
+)
 
 # What we request about the user
 # ------------------------------
@@ -88,7 +86,7 @@ c.DockerSpawner.host_ip = "0.0.0.0"
 # user `jovyan`, and set the notebook directory to `/home/jovyan/work`.
 # We follow the same convention.
 notebook_dir = os.environ.get("DOCKER_NOTEBOOK_DIR", "/home/jovyan/work")
-c.DockerSpawner.notebook_dir = notebook_dir
+c.DockerSpawner.notebook_dir = '/home/jovyan'
 
 share_dir = os.environ.get("DOCKER_SHARE_DIR", "/home/jovyan/share")
 
@@ -123,8 +121,6 @@ c.DockerSpawner.cpu_limit = os.environ.get("DOCKER_CPU_LIMIT", 2)
 c.DockerSpawner.mem_limit = os.environ.get("DOCKER_MEM_LIMIT", "4G")
 
 
-
-
 if os.environ.get("JUPYTERHUB_IDLE_CULLER_ENABLED", "1").lower() in ("true", "yes", "1"):
     c.JupyterHub.load_roles = [
         {
@@ -134,7 +130,7 @@ if os.environ.get("JUPYTERHUB_IDLE_CULLER_ENABLED", "1").lower() in ("true", "ye
                 "read:users:activity",
                 "read:servers",
                 "delete:servers",
-                "admin:users", # if using --cull-users
+                "admin:users",  # if using --cull-users
             ]
         },
         {
@@ -144,14 +140,12 @@ if os.environ.get("JUPYTERHUB_IDLE_CULLER_ENABLED", "1").lower() in ("true", "ye
                 "read:users:activity",
                 "read:servers",
                 "delete:servers",
-                "admin:users", # if using --cull-users
+                "admin:users",  # if using --cull-users
             ],
             # assignment of role's permissions to:
             "services": ["jupyterhub-idle-culler-service"],
         }
     ]
-
-
 
     c.JupyterHub.services = [
         {
@@ -159,7 +153,7 @@ if os.environ.get("JUPYTERHUB_IDLE_CULLER_ENABLED", "1").lower() in ("true", "ye
             "command": [
                 sys.executable,
                 "-m", "jupyterhub_idle_culler",
-                "--timeout={}".format(os.environ.get("JUPYTERHUB_IDLE_CULLER_TIMEOUT", '3600')), #1HR
+                "--timeout={}".format(os.environ.get("JUPYTERHUB_IDLE_CULLER_TIMEOUT", '3600')),  # 1HR
             ],
             # "admin": True,
         }

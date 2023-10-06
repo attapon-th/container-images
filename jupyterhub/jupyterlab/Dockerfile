@@ -9,6 +9,8 @@ RUN apt-get update --yes && \
     tmux \ 
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN usermod -aG sudo jovyan && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 USER 1000
 
 ENV CPATH=$CONDA_DIR/include TZ=Asia/Bangkok
