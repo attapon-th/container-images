@@ -9,7 +9,6 @@ import json
 
 logger: logging.Logger = logging.getLogger()
 
-
 SECRET_KEY = os.getenv("SUPERSET_SECRET_KEY")
 
 FEATURE_FLAGS = {"ALERT_REPORTS": True}
@@ -23,12 +22,12 @@ WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 SQLLAB_CTAS_NO_LIMIT = False
 ROW_LIMIT = 5000
 
-ENABLE_PROXY_FIX = False
+ENABLE_PROXY_FIX = True
 # PROXY_FIX_CONFIG = {"x_for": 1, "x_proto": 1, "x_host": 1, "x_port": 0, "x_prefix": 1}
 
 
 # Flask-WTF flag for CSRF
-WTF_CSRF_ENABLED = False
+WTF_CSRF_ENABLED = True
 # Add endpoints that need to be exempt from CSRF protection
 WTF_CSRF_EXEMPT_LIST = []
 # A CSRF token that expires in 1 year
@@ -159,7 +158,7 @@ AUTH_ROLES_SYNC_AT_LOGIN = True
 AUTH_USER_REGISTRATION = True
 AUTH_USER_REGISTRATION_ROLE = "Public"
 CUSTOM_SECURITY_MANAGER = CustomSecurityManager
-LOGOUT_REDIRECT_URL = ''
+# LOGOUT_REDIRECT_URL = ''
 OAUTH_PROVIDERS = [
     {
         'name': 'keycloak',
