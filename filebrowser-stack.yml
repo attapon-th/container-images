@@ -17,7 +17,7 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
       # user: admin:admin
-    command: --baseurl "${BASE_URL:-/files}"
+    command: --baseurl "${BASE_URL:-/files}" --database "/srv/.filebrowser.db"
     deploy:
       mode: replicated
       replicas: 1
@@ -30,11 +30,10 @@ services:
     networks:
       - proxy
     volumes:
-      - database:/database/filebrowser.db:z
-      - ${VOLUME_MOUNT}:/srv
+      - files-data:/srv
 
 networks:
   proxy:
     external: true
-# volumes:
-#   ${VOLUME_MOUNT}:
+volumes:
+  files-data:
