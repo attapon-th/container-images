@@ -36,6 +36,5 @@ services:
 networks:
   proxy:
     external: true
-
-volumes:
-  database:
+# volumes:
+#   ${VOLUME_MOUNT}:
