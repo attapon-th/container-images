@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  openssh-server:
+    image: attap0n/openssh-server:latest
+    # container_name: openssh-server
+    hostname: openssh-server #optional
+    environment:
+      - PUID=10000
+      - PGID=10000
+      - TZ=Asia/Bangkok
+      # - PUBLIC_KEY_FILE=/path/to/file #optional
+      # - PUBLIC_KEY_DIR=/path/to/pubkeys #optional
+      # - PUBLIC_KEY_URL=https://github.com/username.keys #optional
+      - SUDO_ACCESS=false #optional
+      - PASSWORD_ACCESS=false #optional
+      # - USER_PASSWORD=password #optional
+      # - USER_PASSWORD_FILE=/path/to/file #optional
+      - USER_NAME=openssh-user #optional
+
+    volumes:
+      - config:/config
+    networks:
+      - proxy
+    ports:
+      - 2222:2222
+volumes:
+  config:
+
+networks:
+  proxy:
+    external: true
