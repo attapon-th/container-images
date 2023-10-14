@@ -1,0 +1,21 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  DOCKER_REGISTRY: "attap0n"
+  PROJECT_NAME: "openssh-server"
+  VERSION: latest
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+
+  docker-build:
+    cmds:
+      - docker build -t {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}} .
+
+  docker-push:
+    - docker push {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
