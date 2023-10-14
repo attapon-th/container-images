@@ -13,7 +13,7 @@
 version: "3"
 services:
   jupyterhub:
-    image: jupyterhub-keycloak:latest
+    image: attap0n/jupyterhub-keycloak:latest
     hostname: jupyterhub
 
     # ports:
@@ -49,7 +49,7 @@ services:
       OAUTH2_VALIDATE_SERVER_CERT: 0 # validate oauth2 server certificate. Default: 1
 
       # Docker image settings
-      DOCKER_NOTEBOOK_IMAGE: jupyterlab:latest # Default: jupyter/scipy-notebook:latest
+      DOCKER_NOTEBOOK_IMAGE: attap0n/jupyterlab:latest # Default: jupyter/scipy-notebook:latest
       DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan/work
       DOCKER_SHARE_DIR: /home/jovyan/share # Default: None (not mount) ** if mount share dir you need to set permission directory to chmod 777 or chown 1000:100
       DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh

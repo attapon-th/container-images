@@ -1,0 +1,41 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  REGISTRY_NAME: attap0n
+  HUB_IMAGE: jupyterhub-keycloak:latest
+  LAB_IMAGE: jupyterlab:latest
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+
+  stack:
+    - docker stack deploy -c {{.STACK_FILE}} jupyterhub
+  exec:
+    - docker service exec jupyterhub_jupyterhub sh
+  rm:
+    - docker stack rm jupyterhub
+
+  logf:
+    - docker service logs -f jupyterhub_jupyterhub
+
+  build:
+    - task build-jupyterhub build-jupyterlab
+
+  build-jupyterhub:
+    dir: jupyterhub
+    cmds:
+      - docker build -t {{.REGISTRY_NAME}}/{{.HUB_IMAGE}} .
+
+  build-jupyterlab:
+    dir: jupyterlab
+    cmds:
+      - docker build -t {{.REGISTRY_NAME}}/{{.LAB_IMAGE}} .
+
+  push:
+    - docker push {{.REGISTRY_NAME}}/{{.HUB_IMAGE}}
+    - docker push {{.REGISTRY_NAME}}/{{.LAB_IMAGE}}
