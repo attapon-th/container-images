@@ -1,5 +1,4 @@
 .env
-*.yaml
 /supersetf
 /client_secret.json
 dev.env

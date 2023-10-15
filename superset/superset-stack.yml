@@ -1,4 +1,4 @@
-x-superset-image: &superset-image ${SUPERSET_IMAGE}
+x-superset-image: &superset-image ${SUPERSET_IMAGE:-attap0n/superset:latest}
 x-superset-volumes: &superset-volumes
   - superset_home:/app/superset_home
 x-superset-network: &superset-network

@@ -1,0 +1,48 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  PYTHON_VERSION: "3.10"
+  SUPERSET_VERSION: "3.0.0-py310"
+  IMAGE_NAME: superset
+  IMAGE_TAG: latest
+  DOCKER_REGISTRY: "attap0n"
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+
+  docker-pull:
+    - docker pull apache/superset:{{.SUPERSET_VERSION}}
+
+  docker-build:
+    cmds:
+      - |
+        docker build --build-arg  "BASE_IMAGE=apache/superset" \
+        --build-arg  "VERSION={{.SUPERSET_VERSION}}" \
+        -t {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}} .
+
+  docker-push:
+    - docker push {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+
+  stack:
+    dotenv:
+      - "dev.env"
+    env:
+      SUPERSET_IMAGE: "{{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}"
+    cmds:
+      - docker stack deploy -c superset-stack.yaml superset
+  ff:
+    - docker service update --force superset_superset
+  down-rm:
+    - task down rm-volume
+
+  down:
+    - docker stack rm superset
+
+  rm-volume:
+    - docker volume rm superset_db_home
+    - docker volume rm superset_redis
+    - docker volume rm superset_superset_home
