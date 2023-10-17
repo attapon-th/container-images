@@ -8,8 +8,8 @@ services:
       - PUID=10000
       - PGID=10000
       - TZ=Asia/Bangkok
+      - PUBLIC_KEY_DIR=/config/pubkeys #not change if you use update key with /config/update-pubkey
       # - PUBLIC_KEY_FILE=/path/to/file #optional
-      # - PUBLIC_KEY_DIR=/path/to/pubkeys #optional
       # - PUBLIC_KEY_URL=https://github.com/username.keys #optional
       - SUDO_ACCESS=false #optional
       - PASSWORD_ACCESS=false #optional

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+PUBLIC_KEY_DIR=${PUBLIC_KEY_DIR:-/config/pubkeys}
 mkdir -p "$PUBLIC_KEY_DIR"
 
 if [[ -n "$PUBLIC_KEY" ]]; then

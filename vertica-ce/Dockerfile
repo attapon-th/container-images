@@ -8,4 +8,5 @@ COPY docker-entrypoint.sh /home/dbadmin/docker-entrypoint.sh
 
 RUN chmod +x /home/dbadmin/docker-entrypoint.sh \
     && chown dbadmin /home/dbadmin/docker-entrypoint.sh
+    
 USER dbadmin

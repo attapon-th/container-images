@@ -43,6 +43,18 @@ function stop_agent() {
          1> ${VERTICA_DATA_DIR}/${VERTICA_DB_NAME}/agent_stop.out
 }
 
+BIN_MC=/etc/init.d/vertica-consoled
+function start_mc() {
+    echo "Starting Management Console"
+    sudo ${BIN_MC} start
+}
+
+function stop_mc() {
+    echo "Shutting down Management Console"
+    sudo ${BIN_MC} stop
+}
+
+
 # Vertica should be shut down properly
 function shut_down() {
     echo "Shutting Down"
@@ -180,5 +192,5 @@ echo "Vertica is now running"
 while [ "${STOP_LOOP}" == "false" ]; do
     # We could use admintools -t show_active_db to see if the
     # db is still running, and restart it if it isn't
-    sleep 1
+    sleep 5
 done
