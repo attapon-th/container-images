@@ -43,7 +43,8 @@ tasks:
 
   build:
     - task jar docker-build
-
+  docker-pull:
+    - docker pull quay.io/keycloak/keycloak:{{.DOCKER_TAG}}
   docker-build:
     - |
       docker build \
