@@ -1,0 +1,30 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  DOCKER_REGISTRY:
+    sh: (source .env && echo "${REGISTRY:-attap0n}") || echo "attap0n"
+  PROJECT_NAME: "vertica-ce"
+  VERSION: "23.4.0-0"
+
+tasks:
+  default:
+    cmds:
+      - echo "Image Registry {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}"
+      - task --list-all
+    silent: true
+
+  dev:
+    - docker compose up -d
+    - docker compose logs -f
+  down:
+    - docker compose down
+
+  docker-build:
+    cmds:
+      - docker build --build-arg VERSION={{.VERSION}} -t attap0n/vertica-ce:latest .
+
+  docker-push:
+    - docker tag attap0n/vertica-ce:latest {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
+    - docker push {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}

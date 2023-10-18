@@ -1,0 +1,40 @@
+cp /home/dbadmin/apikeys.dat /opt/vertica/config/apikeys.dat
+sudo chown -R "$(id -u):$(id -g)" /home/dbadmin
+
+
+export VERTICA_DB_USER="`whoami`"
+echo VERTICA_DB_USER is \"$VERTICA_DB_USER\"
+STOP_LOOP="false"
+
+OPT_MC_BIN=/opt/vconsole/shared/vertica-consoled
+function start_mc() {
+    echo "Starting Management Console"
+    sudo ${OPT_MC_BIN} start
+    cat /opt/vertica/config/apikeys.dat
+}
+
+
+# Vertica should be shut down properly
+function shut_down() {
+    echo "Shutting Down"
+    sudo ${OPT_MC_BIN} stop
+    echo 'Stopping loop'
+    STOP_LOOP="true"
+}
+       
+trap "shut_down" SIGKILL SIGTERM SIGHUP SIGINT
+# cron(d) daemonizes, so no need for launching as background process
+if grep -q -i debian /etc/os-release; then
+    sudo /usr/sbin/cron
+else
+    sudo /usr/sbin/crond
+fi
+
+
+start_mc
+echo
+echo "Vertica is now running"
+
+while [ "${STOP_LOOP}" == "false" ]; do
+    sleep 5
+done

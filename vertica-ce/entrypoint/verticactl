@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+cp /home/dbadmin/apikeys.dat /opt/vertica/config/apikeys.dat
+sudo chown -R "$(id -u):$(id -g)" /home/dbadmin
 
 DEBUG_FAILING_STARTUP=y
 if [ "${DEBUG_FAILING_STARTUP}" != "y" ]; then
@@ -43,15 +45,16 @@ function stop_agent() {
          1> ${VERTICA_DATA_DIR}/${VERTICA_DB_NAME}/agent_stop.out
 }
 
-BIN_MC=/etc/init.d/vertica-consoled
+OPT_MC_BIN=/opt/vconsole/bin/mctl
 function start_mc() {
     echo "Starting Management Console"
-    sudo ${BIN_MC} start
+    sudo ${OPT_MC_BIN} start
+    cat /opt/vertica/config/apikeys.dat
 }
 
 function stop_mc() {
     echo "Shutting down Management Console"
-    sudo ${BIN_MC} stop
+    sudo ${OPT_MC_BIN} stop
 }
 
 
@@ -185,7 +188,6 @@ else
     sudo /usr/sbin/crond
 fi
 start_agent
-
 echo
 echo "Vertica is now running"
 
