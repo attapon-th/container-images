@@ -39,11 +39,11 @@ c.GenericOAuthenticator.validate_server_cert = os.getenv("OAUTH2_VALIDATE_SERVER
 c.GenericOAuthenticator.authorize_url = wellknown.get("authorization_endpoint")
 c.GenericOAuthenticator.token_url = wellknown.get("token_endpoint")
 c.GenericOAuthenticator.userdata_url = wellknown.get("userinfo_endpoint")
-c.GenericOAuthenticator.oauth_callback_url = os.getenv("OAUTH2_CALLBACK_URL", None) or "{}/{}/{}".format(jupyterhub_host.removesuffix("/"), jupyterhub_prefix.strip("/"), "oauth_callback")
+c.GenericOAuthenticator.oauth_callback_url = os.getenv("OAUTH2_CALLBACK_URL", None) or urljoin(os.environ.get('JUPYTERHUB_HOST', "http://localhost:8000"), os.environ.get('JUPYTERHUB_BASE_URL', "/"), "oauth_callback")
 c.GenericOAuthenticator.logout_redirect_url = os.getenv("OAUTH2_LOGOUT_REDIRECT_URL", None) or "{}?post_logout_redirect_uri={}&client_id={}".format(
     wellknown.get("end_session_endpoint"),
-    quote(urljoin(jupyterhub_host, c.JupyterHub.base_url)),
-    quote(c.GenericOAuthenticator.client_id),
+    quote(urljoin(os.environ.get('JUPYTERHUB_HOST', "http://localhost:8000"), os.environ.get('JUPYTERHUB_BASE_URL', "/"))),
+    quote(os.environ['OAUTH2_CLIENT_ID']),
 )
 
 # What we request about the user

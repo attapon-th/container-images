@@ -3,7 +3,8 @@
 version: "3"
 
 vars:
-  REGISTRY_NAME: attap0n
+  REGISTRY_NAME:
+    sh: test -f registry.txt && cat registry.txt || echo "attap0n"
   HUB_IMAGE: jupyterhub-keycloak:latest
   LAB_IMAGE: jupyterlab:latest
 
@@ -12,6 +13,8 @@ tasks:
     cmds:
       - task --list-all
     silent: true
+  t:
+    - echo "{{.REGISTRY_NAME}}"
 
   stack:
     - docker stack deploy -c {{.STACK_FILE}} jupyterhub
@@ -29,13 +32,17 @@ tasks:
   build-jupyterhub:
     dir: jupyterhub
     cmds:
-      - docker build -t {{.REGISTRY_NAME}}/{{.HUB_IMAGE}} .
+      - docker build -t {{.HUB_IMAGE}} .
 
   build-jupyterlab:
     dir: jupyterlab
     cmds:
-      - docker build -t {{.REGISTRY_NAME}}/{{.LAB_IMAGE}} .
+      - docker build -t {{.LAB_IMAGE}} .
+  tag:
+    - docker tag {{.HUB_IMAGE}} {{.REGISTRY_NAME}}/{{.HUB_IMAGE}}
+    - docker tag {{.LAB_IMAGE}} {{.REGISTRY_NAME}}/{{.LAB_IMAGE}}
 
   push:
+    - task tag
     - docker push {{.REGISTRY_NAME}}/{{.HUB_IMAGE}}
     - docker push {{.REGISTRY_NAME}}/{{.LAB_IMAGE}}
