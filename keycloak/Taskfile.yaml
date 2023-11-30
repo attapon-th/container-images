@@ -4,6 +4,8 @@ version: "3"
 
 vars:
   DOCKER_REGISRTY: attap0n
+  # DOCKER_REGISRTY:
+  #   sh: test -f registry.txt && cat registry.txt || echo "attap0n"
   DOCKER_IMAGE: keycloak
   DOCKER_TAG: latest
   THEME_JAR: keywind
@@ -43,15 +45,21 @@ tasks:
 
   build:
     - task jar docker-build
+
   docker-pull:
     - docker pull quay.io/keycloak/keycloak:{{.DOCKER_TAG}}
+
   docker-build:
     - |
       docker build \
       --build-arg=THEME_JAR={{.THEME_JAR}} \
       --build-arg=DOCKER_TAG={{.DOCKER_TAG}} \
       --build-arg=PREFIX=/auth \
-      -t {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} .
+      -t {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} .
+
+  tag:
+    - docker tag {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
 
   docker-push:
+    - task tag
     - docker push {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}

@@ -21,21 +21,23 @@ services:
       KC_DB_PASSWORD: ${DB_PASSWORD:-keycloak}
       KEYCLOAK_ADMIN: ${ADMIN_USER:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${ADMIN_PASS:-admin}
-      KC_HOSTNAME_URL: http://${DOMAIN:-localhost:8080}/auth
+      KC_HOSTNAME_URL: http://${DOMAIN}/auth
       KC_HTTP_RELATIVE_PATH: /auth
     command:
       - start
       - --proxy=edge
-    ports:
-      - target: 8080
-        published: 8081
-        protocol: tcp
-        mode: host
     deploy:
       mode: replicated
       replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.keycloak.tls=true"
+        - "traefik.http.routers.keycloak.entrypoints=websecure"
+        - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN}`) && PathPrefix(`/auth`)"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
     networks:
       - keycloak
+      - proxy
 
   postgres_keycloak:
     image: "postgres:15"
@@ -56,6 +58,8 @@ services:
       - keycloak
 
 networks:
+  proxy:
+    external: true
   keycloak:
 
 volumes:
