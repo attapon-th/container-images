@@ -43,7 +43,7 @@ services:
 
       OAUTH2_SCOPE: openid,profile,roles # Default: openid,profile,email
       OAUTH2_USER_CLAIM: preferred_username # Default: preferred_username
-      # OAUTH2_CLAIM_GROUPS_KEY: # Default: resource_access.${OAUTH2_CLIENT_ID}.roles (get with client roles)
+      OAUTH2_CLAIM_GROUPS_KEY: resource_access.${CLIENT_ID}.roles # Default: resource_access.${CLIENT_ID}.roles (get with client roles)
       OAUTH2_ALLOWED_GROUPS: jupyter-user # User Group can use jupterhub.  Default: user (support multi groups, ex: user,staff)
       OAUTH2_ADMIN_GROUPS: jupyter-admin # Admin Group can manage and controler jupyterhub.  Default: admin (support multi groups, ex: admin,staff)
       OAUTH2_VALIDATE_SERVER_CERT: 0 # validate oauth2 server certificate. Default: 1

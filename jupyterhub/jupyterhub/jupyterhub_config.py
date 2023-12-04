@@ -50,8 +50,8 @@ c.GenericOAuthenticator.logout_redirect_url = os.getenv("OAUTH2_LOGOUT_REDIRECT_
 # ------------------------------
 c.GenericOAuthenticator.scope = os.environ.get("OAUTH2_SCOPE", "openid,roles").split(",")
 c.GenericOAuthenticator.username_claim = os.environ.get("OAUTH2_USER_CLAIM", "preferred_username")
-# c.GenericOAuthenticator.claim_groups_key = os.environ.get("OAUTH2_CLAIM_GROUPS_KEY", "resource_access.{}.roles".format(os.environ['OAUTH2_CLIENT_ID']))
-c.GenericOAuthenticator.claim_groups_key = os.environ.get("OAUTH2_CLAIM_GROUPS_KEY", "roles")
+c.GenericOAuthenticator.claim_groups_key = os.environ.get("OAUTH2_CLAIM_GROUPS_KEY", "resource_access.{}.roles".format(os.environ['OAUTH2_CLIENT_ID']))
+# c.GenericOAuthenticator.claim_groups_key = os.environ.get("OAUTH2_CLAIM_GROUPS_KEY", "roles")
 
 # Group whitelisting
 # -------------

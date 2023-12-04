@@ -1,3 +1,3 @@
 /test
 *.code-workspace
-*/Taskfile.y*
+Taskfile.yaml
