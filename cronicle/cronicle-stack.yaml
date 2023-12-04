@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  cronicle:
+    image: attap0n/cronicle:latest
+    container_name: cronicle
+    # hostname: ${DOMAIN}
+    ports:
+      - 3012:3012
+    extra_hosts:
+      - "${DOMAIN}:0.0.0.0"
+    environment:
+      - TZ=Asia/Bangkok
+      - HOSTNAME=${DOMAIN}
+      - CRONICLE_foreground=1
+      - CRONICLE_echo=0
+      - CRONICLE_base_app_url=http://${DOMAIN}:3012
+      - CRONICLE_web_socket_use_hostnames=1
+      - CRONICLE_server_comm_use_hostnames=1
+      - CRONICLE_web_direct_connect=0
+      - CRONICLE_WebServer__http_port=3012
+      - CRONICLE_WebServer__https_port=3012
+      - CRONICLE_WebServer__http_bind_address=0.0.0.0
+      - CRONICLE_WebServer__https=0
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=proxy"
+        - "traefik.http.routers.cronicle-ssl.tls=true"
+        - "traefik.http.routers.cronicle-ssl.entrypoints=websecure,web"
+        - "traefik.http.routers.cronicle-ssl.rule=Host(`${DOMAIN}`)"
+        - "traefik.http.services.cronicle-backend.loadbalancer.server.scheme=http"
+        - "traefik.http.services.cronicle-backend.loadbalancer.server.port=3012"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:3012/api/app/ping || exit 1"]
+      interval: 5s
+      timeout: 1s
+      retries: 3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/cronicle/data:/opt/cronicle/data:rw
+      - /opt/logs:/opt/cronicle/logs:rw
+      - /opt/plugins:/opt/cronicle/plugins:rw
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true
