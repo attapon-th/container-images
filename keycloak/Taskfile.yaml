@@ -4,8 +4,6 @@ version: "3"
 
 vars:
   DOCKER_REGISRTY: attap0n
-  # DOCKER_REGISRTY:
-  #   sh: test -f registry.txt && cat registry.txt || echo "attap0n"
   DOCKER_IMAGE: keycloak
   DOCKER_TAG: latest
   THEME_JAR: keywind
