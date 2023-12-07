@@ -21,15 +21,17 @@ services:
       - CRONICLE_WebServer__https_port=3012
       - CRONICLE_WebServer__http_bind_address=0.0.0.0
       - CRONICLE_WebServer__https=0
+      #  update env
+      # - WOKER=true # for worker
     deploy:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=proxy"
-        - "traefik.http.routers.cronicle-ssl.tls=true"
-        - "traefik.http.routers.cronicle-ssl.entrypoints=websecure,web"
-        - "traefik.http.routers.cronicle-ssl.rule=Host(`${DOMAIN}`)"
-        - "traefik.http.services.cronicle-backend.loadbalancer.server.scheme=http"
-        - "traefik.http.services.cronicle-backend.loadbalancer.server.port=3012"
+        - "traefik.http.routers.cronicle.tls=true"
+        - "traefik.http.routers.cronicle.entrypoints=websecure,web"
+        - "traefik.http.routers.cronicle.rule=Host(`${DOMAIN}`)"
+        - "traefik.http.services.cronicle.loadbalancer.server.scheme=http"
+        - "traefik.http.services.cronicle.loadbalancer.server.port=3012"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:3012/api/app/ping || exit 1"]
       interval: 5s
@@ -38,8 +40,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /opt/cronicle/data:/opt/cronicle/data:rw
-      - /opt/logs:/opt/cronicle/logs:rw
-      - /opt/plugins:/opt/cronicle/plugins:rw
+      - /opt/cronicle/logs:/opt/cronicle/logs:rw
+      - /opt/cronicle/plugins:/opt/cronicle/plugins:rw
     networks:
       - proxy
 networks:
