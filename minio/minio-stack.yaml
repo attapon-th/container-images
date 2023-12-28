@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  minio:
+    image: quay.io/minio/minio:latest
+    hostname: minio
+    environment:
+      TZ: Asia/Bangkok
+      MINIO_VOLUMES: "/data1"
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin
+      MINIO_SERVER_URL: "https://${DOMAIM}:9000"
+      MINIO_BROWSER_REDIRECT_URL: "https://${DOMAIM}:9001"
+      MINIO_BROWSER_SESSION_DURATION: 1h
+      MINIO_PROMETHEUS_URL: http://prometheus:9090
+      MINIO_PROMETHEUS_JOB_ID: minio-job
+    command: minio server --console-address ":9001" --address ":9000" --certs-dir "/certs"
+    ports:
+      - target: 9000
+        published: 9000
+        protocol: tcp
+        mode: host
+      - target: 9001
+        published: 9001
+        protocol: tcp
+        mode: host
+    networks:
+      - minio
+      - proxy
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - /data1:/data1
+      - /etc/timezone:/etc/timezone:ro
+      - /home/syscmu/docker/minio/certs:/certs
+
+  prometheus:
+    image: prom/prometheus:latest
+    hostname: prometheus
+    environment:
+      TZ: Asia/Bangkok
+    volumes:
+      - prometheus-data:/prometheus
+    networks:
+      - minio
+    configs:
+      - source: minio_prometheus
+        target: /etc/prometheus/prometheus.yml
+
+networks:
+  minio:
+  proxy:
+    external: true
+volumes:
+  minio-data:
+  prometheus-data:
+configs:
+  minio_prometheus:
+    external: true
