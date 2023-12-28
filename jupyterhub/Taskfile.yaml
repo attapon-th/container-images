@@ -4,7 +4,8 @@ version: "3"
 
 vars:
   REGISTRY_NAME: attap0n
-  HUB_IMAGE: jupyterhub-keycloak:latest
+  HUB_KEYCLOAK: jupyterhub-keycloak:latest
+  HUB_TLJH: jupyterhub-tljh:latest
   LAB_IMAGE: jupyterlab:latest
 
 tasks:
@@ -26,22 +27,24 @@ tasks:
     - docker service logs -f jupyterhub_jupyterhub
 
   build:
-    - task build-jupyterhub build-jupyterlab
+    - task build-jupyterhub-keycloak
+    - task build-jupyterhub-tljh
 
-  build-jupyterhub:
-    dir: jupyterhub
+  build-jupyterhub-keycloak:
+    dir: jupyterhub-keycloak
     cmds:
-      - docker build -t {{.HUB_IMAGE}} .
+      - docker build -t {{.REGISTRY_NAME}}/{{.HUB_KEYCLOAK}} .
+
+  build-jupyterhub-tljh:
+    dir: jupyterhub-tljh
+    cmds:
+      - docker build -t {{.REGISTRY_NAME}}/{{.HUB_TLJH}} .
 
   build-jupyterlab:
     dir: jupyterlab
     cmds:
-      - docker build -t {{.LAB_IMAGE}} .
-  tag:
-    - docker tag {{.HUB_IMAGE}} {{.REGISTRY_NAME}}/{{.HUB_IMAGE}}
-    - docker tag {{.LAB_IMAGE}} {{.REGISTRY_NAME}}/{{.LAB_IMAGE}}
+      - docker build -t {{.REGISTRY_NAME}}/{{.LAB_IMAGE}} .
 
   push:
-    - task tag
-    - docker push {{.REGISTRY_NAME}}/{{.HUB_IMAGE}}
-    - docker push {{.REGISTRY_NAME}}/{{.LAB_IMAGE}}
+    - docker push {{.REGISTRY_NAME}}/{{.HUB_KEYCLOAK}}
+    - docker push {{.REGISTRY_NAME}}/{{.HUB_TLJH}}

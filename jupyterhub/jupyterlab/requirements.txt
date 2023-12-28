@@ -1,5 +1,4 @@
 pandas[fsspec,s3fs,pyarrow]
 pymysql
-SQLAlchemy
 psycopg2-binary
-git+https://github.com/attapon-th/sqlalchemy-vertica-python.git@6bca2fd18fd4a456736f2a05af68a0d26e2f7dd7
+SQLAlchemy

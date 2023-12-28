@@ -42,7 +42,7 @@ c.GenericOAuthenticator.userdata_url = wellknown.get("userinfo_endpoint")
 c.GenericOAuthenticator.oauth_callback_url = os.getenv("OAUTH2_CALLBACK_URL", None) or urljoin(os.environ.get('JUPYTERHUB_HOST', "http://localhost:8000"), os.environ.get('JUPYTERHUB_BASE_URL', "/"), "oauth_callback")
 c.GenericOAuthenticator.logout_redirect_url = os.getenv("OAUTH2_LOGOUT_REDIRECT_URL", None) or "{}?post_logout_redirect_uri={}&client_id={}".format(
     wellknown.get("end_session_endpoint"),
-    quote(urljoin(os.environ.get('JUPYTERHUB_HOST', "http://localhost:8000"), os.environ.get('JUPYTERHUB_BASE_URL', "/"))),
+    quote(urljoin(os.environ.get('JUPYTERHUB_HOST', "http://localhost:8000"), os.environ.get('JUPYTERHUB_BASE_URL', "/hub"))),
     quote(os.environ['OAUTH2_CLIENT_ID']),
 )
 
@@ -104,7 +104,7 @@ if share_dir != "":
 
 
 # Remove containers once they are stopped
-c.DockerSpawner.remove = False
+c.DockerSpawner.remove = os.getenv("JUPYTERHUB_REMOVE_CONTAINERS", "0").lower() in ("1", "true", "yes")
 
 # For debugging arguments passed to spawned containers
 c.DockerSpawner.debug = False
