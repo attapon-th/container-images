@@ -5,8 +5,7 @@ version: "3"
 vars:
   DOCKER_REGISRTY: attap0n
   DOCKER_IMAGE: keycloak
-  DOCKER_TAG: latest
-  THEME_JAR: keywind
+  DOCKER_TAG: 23.0.3
 
 tasks:
   default:
@@ -26,23 +25,8 @@ tasks:
         -e KC_HTTP_PORT=8888 \
         {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}  start
 
-  jar-list:
-    # - mkdir -p build
-    # - cp -r ./{{.THEME_JAR}}/theme build/theme
-    # - cp -r ./{{.THEME_JAR}}/META-INF build/META-INF
-    # - jar --create --file {{.THEME_JAR}}.jar -C ./build .
-    # - rm -rf build
-    - jar tf {{.THEME_JAR}}.jar
-
-  jar:
-    dir: ./keywind
-    cmds:
-      - pnpm build:jar
-      - cp ./out/keywind.jar ../{{.THEME_JAR}}.jar
-      # - jar tf {{.THEME_JAR}}.jar
-
   build:
-    - task jar docker-build
+    - task docker-build
 
   docker-pull:
     - docker pull quay.io/keycloak/keycloak:{{.DOCKER_TAG}}
@@ -50,14 +34,15 @@ tasks:
   docker-build:
     - |
       docker build \
-      --build-arg=THEME_JAR={{.THEME_JAR}} \
       --build-arg=DOCKER_TAG={{.DOCKER_TAG}} \
       --build-arg=PREFIX=/auth \
       -t {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} .
 
   tag:
     - docker tag {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    - docker tag {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:latest
 
   docker-push:
     - task tag
     - docker push {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    - docker push {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:latest

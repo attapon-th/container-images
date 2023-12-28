@@ -1,6 +1,5 @@
 ARG DOCKER_TAG=latest
 FROM quay.io/keycloak/keycloak:${DOCKER_TAG} as builder
-ARG THEME_JAR=keywind
 ARG PREFIX
 
 # Enable health and metrics support
@@ -15,7 +14,7 @@ RUN keytool -genkeypair -storepass password -storetype PKCS12 -keyalg RSA -keysi
 RUN /opt/keycloak/bin/kc.sh build
 
 # add theme
-# COPY ./${THEME_JAR}.jar /opt/keycloak/providers/${THEME_JAR}.jar
+COPY themes/*.jar /opt/keycloak/providers/
 
 FROM quay.io/keycloak/keycloak:${DOCKER_TAG}
 ARG PREFIX

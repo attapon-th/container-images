@@ -22,7 +22,7 @@ services:
       KEYCLOAK_ADMIN: ${ADMIN_USER:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${ADMIN_PASS:-admin}
       KC_HOSTNAME_URL: http://${DOMAIN}/auth
-      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HTTP_RELATIVE_PATH: /auth # only /auth or /
     command:
       - start
       - --proxy=edge
