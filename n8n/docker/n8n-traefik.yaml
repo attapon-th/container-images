@@ -1,0 +1,28 @@
+http:
+  routers:
+    n8n:
+      tls: true
+      rule: Host(`localhost`) && PathPrefix(`/n8n-app`, `/workflows/demo`, `/types/{regex:\w+\.json$}`, `/n8n-{regex:.+}`, `/{regex:.+\\/n8n-.+\\/}`)
+      entryPoints: ["web", "websecure"]
+      service: n8n
+      middlewares:
+        - n8n-headers
+        - n8n-stripprefix
+  middlewares:
+    n8n-headers:
+      headers:
+        STSSeconds: "315360000"
+        browserXSSFilter: "true"
+        contentTypeNosniff: "true"
+        forceSTSHeader: "true"
+        STSIncludeSubdomains: "true"
+        STSPreload: "true"
+    n8n-stripprefix:
+      stripPrefix:
+        prefixes: /n8n-app
+
+  services:
+    n8n:
+      loadBalancer:
+        server:
+          port: 5678

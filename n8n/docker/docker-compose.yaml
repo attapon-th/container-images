@@ -1,0 +1,43 @@
+x-n8n-volume: &n8n-volume
+
+version: "3.8"
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    environment:
+      - TZ=Asia/Bangkok
+      - GENERIC_TIMEZONE=Asia/Bangkok
+      - NODE_ENV=production
+
+      - N8N_ENCRYPTION_KEY=change-me-please
+
+      # add path prefixe (example: /n8n-app)
+      #
+      - N8N_PROTOCOL=http
+      - N8N_HOST=localhost
+      - N8N_PATH=/n8n-app/
+      - N8N_REST=/n8n-rest/ # for n8n rest api
+      - WEBHOOK_URL=http://localhost/n8n-app/webhook
+      - N8N_LOG_LEVEL=error
+
+      - DB_SQLITE_VACUUM_ON_STARTUP=true
+      - N8N_TEMPLATES_ENABLED=false
+    volumes:
+      - ./data/.n8n:/home/node/.n8n
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+    depends_on:
+      initContainer:
+        condition: service_completed_successfully
+
+  initContainer:
+    image: busybox
+    command: ["sh", "-c", "chown -R 1000:1000 /home/node/.n8n"]
+    volumes:
+      - ./data/.n8n:/home/node/.n8n
+
+networks:
+  proxy:
+    external: true

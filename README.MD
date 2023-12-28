@@ -1,6 +1,8 @@
-# Docker Images 
+# Docker Images  (All projects is reverse proxy with traefik 2.x)
 
 > this docker images are created for `Docker stack`
+>
+
 
 ## Project Support (Required)
 
@@ -11,16 +13,16 @@
 ## List
 
 - [x] [Keycloak](./keycloak/) 
-- [x] [Jupyter HUB](./juptyerhub/) 
+- [x] [JupyterHub](./juptyerhub/) 
 - [x] [N8N Workflow](./n8n/) 
-- [ ] [Airflow](./airflow/) (only use docker compose)
 - [x] [Superset](./superset/)
+- [x] [Cronicle v0.9.39](./cronicle/)
+- [x] [Docker Registry v2](./docker-registry/)
+- [x] [Minio](./minio/)
+- [x] [Filebrowser](./filebrowser/)
+- [x] [Openssh-server](./openssh-server/)
+- [x] [Vertica CE Standalone v.23.4.0](./vertica-ce/)
 
----
-
-- [x] [minio.yaml](./minio-stack.yml)
-- [x] [filebrowser.yaml](./filebrowser-stack.yml)
-- [x] [docker-registry.yaml](./docker-registry.yml)
 
 ## How to Deploy with Portainer
 

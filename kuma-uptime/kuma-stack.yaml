@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    volumes:
+      - uptime-kuma-data:/app/data
+    # ports:
+    #   - 3001:3001 # <Host Port>:<Container Port>
+    environment:
+      - TZ=Asia/Bangkok
+
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.uptime_kuma.tls=true"
+        - "traefik.http.routers.uptime_kuma.entrypoints=websecure"
+        - "traefik.http.routers.uptime_kuma.rule=Host(`${DOMAIN}`)"
+        - "traefik.http.services.uptime_kuma.loadbalancer.server.port=3001"
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true
+volumes:
+  uptime-kuma-data:

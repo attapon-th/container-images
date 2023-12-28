@@ -1,0 +1,21 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  build:
+    dir: n8n
+    cmds:
+      - docker build -t n8n-custom -f ../Dockerfile .
+
+  push:
+    - docker tag n8n-custom attap0n/n8n:latest
+    - docker push attap0n/n8n:latest

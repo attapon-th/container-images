@@ -69,6 +69,7 @@ services:
     image: bitnami/postgresql:15
     hostname: superset_db
     environment: *superset-environment
+
     networks: *superset-network
     volumes:
       - db_home:/bitnami/postgresql
