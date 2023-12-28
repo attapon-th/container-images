@@ -1,4 +1,15 @@
 # n8n use traefik reverse proxy
+#
+# Environment variables
+# POSTGRES_PASSWORD=postgress-password-change-me
+# N8N_PROTOCOL=http
+# N8N_HOST=localhost
+# N8N_PATH=/n8n-app
+# N8N_REST=n8n-rest
+# WEBHOOK_URL=http://localhost/n8n-app/
+# N8N_ENCRYPTION_KEY=randomkey-change-me
+#
+
 version: "3.8"
 volumes:
   postgressql_n8n:
@@ -54,7 +65,6 @@ x-n8n-common: &n8n-common
     - N8N_PROTOCOL=${N8N_PROTOCOL}
     - N8N_HOST=${N8N_HOST}
     - N8N_PATH=${N8N_PATH}/
-    - BASE_PATH=${N8N_PATH}
     - WEBHOOK_URL=${WEBHOOK_URL}
     - N8N_ENDPOINT_REST=${N8N_REST}
     - N8N_LOG_LEVEL=info
@@ -117,6 +127,7 @@ services:
   n8n:
     <<: *n8n-common
     hostname: n8n
+
     # command: start
     networks:
       - n8n
@@ -124,6 +135,10 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
       <<: *n8n-label
 
   n8n-worker:
@@ -131,11 +146,11 @@ services:
     command: worker
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 0
 
   n8n-webhook:
     <<: *n8n-common
     command: webhook
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 0
