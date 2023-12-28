@@ -1,0 +1,46 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  DOCKER_REGISTRY: attap0n
+  DOCKER_IMAGE: "cronicle"
+  CRONICLE_VERSION: 0.9.39
+
+tasks:
+  default:
+    cmds:
+      - echo "Image Registry {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}"
+      - task --list-all
+    silent: true
+
+  dev:
+    - docker compose up -d
+    - docker compose logs -f
+  down:
+    - docker compose down
+
+  docker-build:
+    dir: docker
+    cmds:
+      - docker build --build-arg CRONICLE_VERSION={{.CRONICLE_VERSION}} -t {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}} .
+
+  docker-scan:
+    - docker scan {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
+
+  docker-push:
+    - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
+    - task docker-push-latest
+
+  docker-push-latest:
+    - docker tag {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}} {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
+    - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
+
+  t:
+    env:
+      WORKER: "true"
+    cmds:
+      - |
+        if [ -z "$WORKER" ]; then
+            echo "None Worker"
+        fi
