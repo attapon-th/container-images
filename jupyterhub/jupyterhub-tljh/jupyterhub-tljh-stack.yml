@@ -1,0 +1,70 @@
+# follow environment variables
+# file: example.env
+#  -------- Env ----------
+# HTTPS=http
+# DOMAIN=localhost
+# PREFIX=/jupyterhub
+# CRYPT_KEY=changeme # (example random: openssl rand -base64 32)
+# NOTEBOOK_IMAGE=jupyter/scipy-notebook:latest
+# ADMIN_USERS=admin1,admin2 # frist login is set password (default admin)
+#  -------- END Env ----------
+version: "3"
+services:
+  jupyterhub:
+    image: attap0n/jupyterhub-tljh:latest
+    hostname: jupyterhuh
+
+    environment:
+      TZ: Asia/Bangkok
+      DOCKER_NETWORK_NAME: jupyterhub_network
+      # JupyterHub settings
+      JUPYTERHUB_CRYPT_KEY: ${CRYPT_KEY} # required
+      JUPYTERHUB_HOST: ${HTTPS}://${DOMAIN} # Default: http://localhost:8000
+      JUPYTERHUB_BASE_URL: ${PREFIX}/ # Default: /
+
+      JUPYTERHUB_ADMIN_USERS: ${ADMIN_USERS}
+
+      # Docker image settings
+      DOCKER_NOTEBOOK_IMAGE: ${NOTEBOOK_IMAGE} # Default: jupyter/scipy-notebook:latest
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan/work
+      DOCKER_SHARE_DIR: /home/jovyan/share # Default: None (not mount) ** if mount share dir you need to set permission directory to chmod 777 or chown 1000:100
+      DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh
+
+      JUPYTERHUB_IDLE_CULLER_ENABLED: 1 # Default: 1
+      JUPYTERHUB_REMOVE_CONTAINERS: 0 # Default: 0  remove containers when notebook is stopped
+
+      SPAWNER_CPU_LIMIT: 2 # Default: 2
+      SPAWNER_MEM_LIMIT: 4G # Default: 4G
+      JUPYTERHUB_IDLE_CULLER_TIMEOUT: 3600 # 6hr  Default: 3600
+
+    networks:
+      - jupyterhub_network
+      - proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - jupyterhub_data:/data
+
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      # if use traefik reverse proxy
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jupyterhub.tls=true"
+        - "traefik.http.routers.jupyterhub.rule=Host(`${DOMAIN}`) && PathPrefix(`${PREFIX}`)"
+        - "traefik.http.routers.jupyterhub.entryPoints=web,websecure"
+        - "traefik.http.services.jupyterhub.loadbalancer.server.port=8000"
+
+networks:
+  jupyterhub_network:
+    driver: overlay
+    attachable: true
+
+  proxy:
+    external: true
+
+volumes:
+  jupyterhub_data:
