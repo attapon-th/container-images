@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  registry:
+    image: registry:2
+    environment:
+      TZ: Asia/Bangkok
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.docker_registry.tls=true"
+        - "traefik.http.routers.docker_registry.entrypoints=websecure"
+        - "traefik.http.routers.docker_registry.rule=Host(`${DOMAIN}`) && PathPrefix(`/v2/`)"
+        - "traefik.http.services.docker_registry.loadbalancer.server.port=5000"
+        - "traefik.http.middlewares.docker_registry.basicauth.users=${USERS}"
+        - "traefik.http.routers.docker_registry.middlewares=docker_registry"
+    networks:
+      - proxy
+    volumes:
+      - data:/var/lib/registry
+
+networks:
+  proxy:
+    external: true
+volumes:
+  data:
