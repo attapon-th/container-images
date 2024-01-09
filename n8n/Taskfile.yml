@@ -3,7 +3,10 @@
 version: "3"
 
 vars:
-  GREETING: Hello, World!
+  DOCKER_REGISTRY: attap0n
+  DOCKER_IMAGE: n8n
+  DOCKER_TAG: latest
+  N8N_VERSION: latest
 
 tasks:
   default:
@@ -11,11 +14,10 @@ tasks:
       - echo "{{.GREETING}}"
     silent: true
 
-  build:
-    dir: n8n
+  docker-build:
     cmds:
-      - docker build -t n8n-custom -f ../Dockerfile .
+      - docker pull n8nio/n8n:{{.N8N_VERSION}}
+      - docker build --build-arg N8N_VERSION={{.N8N_VERSION}} -t {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} -f ./docker/Dockerfile .
 
-  push:
-    - docker tag n8n-custom attap0n/n8n:latest
-    - docker push attap0n/n8n:latest
+  docker-push:
+    - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
