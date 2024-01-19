@@ -153,6 +153,7 @@ AUTH_ROLES_MAPPING = {
     "viewer": ["Public"],
     "sql_lab": ["sql_lab"],
 }
+PUBLIC_ROLE_LIKE="Gamma"
 # AUTH_ROLES_SYNC_AT_LOGIN = False
 AUTH_ROLES_SYNC_AT_LOGIN = True
 AUTH_USER_REGISTRATION = True

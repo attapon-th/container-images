@@ -10,7 +10,7 @@ ENV        CRONICLE_WebServer__http_port 3012
 ENV        CRONICLE_WebServer__https_port 3012
 ENV        EDITOR=vim
 
-RUN        apk add --no-cache nodejs npm git curl wget perl bash perl-pathtools tar procps vim tini python3
+RUN        apk add --no-cache nodejs npm git curl wget perl bash perl-pathtools tar procps vim tini python3 py3-pip 
 RUN        mkdir -p /opt/cronicle \
     && cd /opt/cronicle \
     && curl -L https://github.com/jhuckaby/Cronicle/archive/v${CRONICLE_VERSION}.tar.gz | tar zxvf - --strip-components 1 \
