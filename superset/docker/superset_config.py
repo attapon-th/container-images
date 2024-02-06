@@ -6,7 +6,7 @@ from flask_appbuilder.security.manager import AUTH_OAUTH
 from security_manager import CustomSecurityManager
 from urllib.request import urlopen, urljoin, quote
 import json
-
+from cachelib.redis import RedisCache
 logger: logging.Logger = logging.getLogger()
 
 SECRET_KEY = os.getenv("SUPERSET_SECRET_KEY")
@@ -71,12 +71,23 @@ CACHE_CONFIG = {
 # 2
 DATA_CACHE_CONFIG = CACHE_CONFIG
 # 3
-RESULTS_BACKEND = {
-    'CACHE_TYPE': 'RedisCache',
-    'CACHE_DEFAULT_TIMEOUT': 3600,
-    'CACHE_KEY_PREFIX': 'superset_be_',
-    'CACHE_REDIS_URL': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_BACKEND}'
-}
+if str(REDIS_RESULTS_BACKEND).isnumeric() is False:
+    REDIS_RESULTS_BACKEND = "3"
+    
+RESULTS_BACKEND = RedisCache(
+    host=REDIS_HOST, 
+    port=REDIS_PORT, 
+    key_prefix="superset_be_",
+    default_timeout=86400,
+    db=int(REDIS_RESULTS_BACKEND)
+    )
+# {
+#     'CACHE_TYPE': 'RedisCache',
+#     'CACHE_DEFAULT_TIMEOUT': 3600,
+#     'CACHE_KEY_PREFIX': 'superset_be_',
+#     'CACHE_REDIS_URL': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_BACKEND}'
+# }
+
 # 4
 FILTER_STATE_CACHE_CONFIG = {
     'CACHE_TYPE': 'RedisCache',
