@@ -11,8 +11,8 @@
 # default value.
 
 Port 2222
-#AddressFamily any
-#ListenAddress 0.0.0.0
+AddressFamily inet
+ListenAddress 0.0.0.0
 #ListenAddress ::
 
 #HostKey /etc/ssh/ssh_host_rsa_key
@@ -86,7 +86,7 @@ AllowTcpForwarding yes
 # GatewayPorts no
 X11Forwarding yes
 #X11DisplayOffset 10
-#X11UseLocalhost yes
+X11UseLocalhost yes
 # PermitTTY yes
 # PrintMotd yes
 # PrintLastLog yes

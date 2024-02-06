@@ -4,7 +4,7 @@ version: "3"
 
 vars:
   PYTHON_VERSION: "3.10"
-  SUPERSET_VERSION: "3.0.0-py310"
+  SUPERSET_VERSION: "3.1.0-py310"
   IMAGE_NAME: superset
   IMAGE_TAG: latest
   DOCKER_REGISTRY: "attap0n"

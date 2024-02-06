@@ -2,7 +2,6 @@ flask-oidc==1.3.0
 itsdangerous==2.0.1
 flask_openid
 authlib
+git+https://github.com/attapon-th/sqlalchemy-vertica-python@latest
 pymysql 
 psycopg2-binary
-clickhouse-connect 
-sqlalchemy-vertica-python
