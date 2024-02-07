@@ -15,8 +15,8 @@ USER 1000
 
 ENV CPATH=$CONDA_DIR/include TZ=Asia/Bangkok
 
-COPY requirements.txt .
+# COPY requirements.txt .
 ## Install JupyterLab and language server
-RUN pip install --no-cache-dir -U pip jupyterhub jupyterlab-lsp "python-lsp-server[all]" \
-    && pip install --no-cache-dir -r requirements.txt \
-    && rm -f requirements.txt
+RUN pip install --no-cache-dir -U pip jupyterhub jupyterlab-lsp "python-lsp-server[all]" 
+    # && pip install --no-cache-dir -r requirements.txt \
+    # && rm -f requirements.txt

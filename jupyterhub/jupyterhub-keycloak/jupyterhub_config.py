@@ -117,8 +117,8 @@ c.JupyterHub.db_url = "sqlite:////data/jupyterhub.sqlite"
 # Resuource limits
 c.DockerSpawner.cpu_guarantee = 1
 c.DockerSpawner.mem_guarantee = "2G"
-c.DockerSpawner.cpu_limit = os.environ.get("DOCKER_CPU_LIMIT", 2)
-c.DockerSpawner.mem_limit = os.environ.get("DOCKER_MEM_LIMIT", "4G")
+# c.DockerSpawner.cpu_limit = os.environ.get("DOCKER_CPU_LIMIT", 2)
+# c.DockerSpawner.mem_limit = os.environ.get("DOCKER_MEM_LIMIT", "4G")
 
 
 if os.environ.get("JUPYTERHUB_IDLE_CULLER_ENABLED", "1").lower() in ("true", "yes", "1"):
