@@ -144,7 +144,7 @@ if [ ! -d ${VERTICA_DATA_DIR}/${VERTICA_DB_NAME} ]; then
 
     ${ADMINTOOLS} -t create_db \
                   --skip-fs-checks \
-                  -s localhost \
+                  -s 127.0.0.1 \
                   --database=$VERTICA_DB_NAME \
                   --catalog_path=${VERTICA_DATA_DIR} \
                   --data_path=${VERTICA_DATA_DIR}

@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   vertica-ce:
-    image: attap0n/vertica-ce:latest
+    image: attap0n/vertica-ce:24.1.0-0
     environment:
       APP_DB_USER: "dbadmin"
       APP_DB_PASSWORD: "vertica"
@@ -13,12 +13,12 @@ services:
     volumes:
       - ./tmp/data:/data
 
-  vertica-mc:
-    image: attap0n/vertica-ce:latest
-    entrypoint: ["/bin/bash", "-c", "mcctl"]
-    environment:
-      TZ: "Asia/Bangkok"
-    ports:
-      - "5450:5450"
-    volumes:
-      - ./tmp/home:/home/dbadmin
+  # vertica-mc:
+  #   image: attap0n/vertica-ce:latest
+  #   entrypoint: ["/bin/bash", "-c", "mcctl"]
+  #   environment:
+  #     TZ: "Asia/Bangkok"
+  #   ports:
+  #     - "5450:5450"
+  #   volumes:
+  #     - ./tmp/home:/home/dbadmin

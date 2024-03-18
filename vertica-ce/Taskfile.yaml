@@ -6,7 +6,7 @@ vars:
   DOCKER_REGISTRY:
     sh: (source .env && echo "${REGISTRY:-attap0n}") || echo "attap0n"
   PROJECT_NAME: "vertica-ce"
-  VERSION: "23.4.0-0"
+  VERSION: "24.1.0-0"
 
 tasks:
   default:
@@ -23,8 +23,8 @@ tasks:
 
   docker-build:
     cmds:
-      - docker build --build-arg VERSION={{.VERSION}} -t attap0n/vertica-ce:latest .
+      - docker build --build-arg VERSION={{.VERSION}} -t attap0n/vertica-ce:{{.VERSION}} .
 
   docker-push:
-    - docker tag attap0n/vertica-ce:latest {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
+    # - docker tag attap0n/vertica-ce:{{.VERSION}} {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
     - docker push {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
