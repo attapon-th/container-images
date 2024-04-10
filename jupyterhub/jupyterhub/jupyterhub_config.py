@@ -4,6 +4,7 @@ import sys
 
 c = get_config()  # noqa: F821
 
+c.NotebookApp.iopub_data_rate_limit=1.0e10
 
 c.JupyterHub.authenticator_class = "firstuseauthenticator.FirstUseAuthenticator"
 c.FirstUseAuthenticator.dbm_path = "/data/passwd.dbm"

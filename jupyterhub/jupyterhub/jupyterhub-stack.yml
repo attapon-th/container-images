@@ -1,0 +1,54 @@
+version: "3.8"
+services:
+  jupyterhub:
+    image: attap0n/jupyterhub:latest
+    hostname: jupyterhub
+    ports:
+      - target: 8000
+        published: 8000
+        protocol: tcp
+        mode: host
+    environment:
+      TZ: Asia/Bangkok
+      DOCKER_NETWORK_NAME: jupyterhub_network
+      # JupyterHub settings
+
+      # test key change me
+      # required (random: openssl rand -base64 32)
+      JUPYTERHUB_CRYPT_KEY: SvbeBZKVh36N2WGZmsPGKQYKdihqwLplP5mqoxs9S/k=
+
+      JUPYTERHUB_HOST: http://localhost:8000
+      JUPYTERHUB_BASE_URL: /jupyterhub/
+
+      # Docker image settings
+      DOCKER_NOTEBOOK_IMAGE: quay.io/jupyter/scipy-notebook:python-3.11 # Default: jupyter/scipy-notebook:latest
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work # Default: /home/jovyan/work
+      DOCKER_SHARE_DIR: /home/jovyan/share # Default: None (not mount) ** if mount share dir you need to set permission directory to chmod 777 or chown 1000:100
+      DOCKER_SPAWN_CMD: start-singleuser.sh # Default: start-singleuser.sh
+      DOCKER_SPAWNER_REMOVE: "0"
+
+      # SPAWNER_CPU_LIMIT: 8 # Default: 2
+      # SPAWNER_MEM_LIMIT: 8G # Default: 4G
+      #
+
+      # down jupyterlab if it not use. Default: 3600
+      JUPYTERHUB_IDLE_CULLER_ENABLED: 1 # Default: 1
+      JUPYTERHUB_IDLE_CULLER_TIMEOUT: 18000 #  18000 = 5hr,
+
+    networks:
+      - jupyterhub_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - jupyterhub_data:/data
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+networks:
+  jupyterhub_network:
+    external: true
+
+volumes:
+  jupyterhub_data:
