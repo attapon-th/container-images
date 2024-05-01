@@ -25,6 +25,9 @@ tasks:
     cmds:
       - docker build --build-arg VERSION={{.VERSION}} -t attap0n/vertica-ce:{{.VERSION}} .
 
+  docker-tag:
+    - docker tag attap0n/vertica-ce:{{.VERSION}} {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
+
   docker-push:
     # - docker tag attap0n/vertica-ce:{{.VERSION}} {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
     - docker push {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}

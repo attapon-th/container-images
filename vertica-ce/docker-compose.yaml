@@ -6,8 +6,7 @@ services:
       APP_DB_USER: "dbadmin"
       APP_DB_PASSWORD: "vertica"
       TZ: "Asia/Bangkok"
-    entrypoint: ["/bin/bash", "-c", "verticactl"]
-    restart: always
+    restart: on-failure
     ports:
       - "5433:5433"
     volumes:

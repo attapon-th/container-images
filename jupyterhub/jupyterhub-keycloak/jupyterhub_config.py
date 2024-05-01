@@ -6,7 +6,7 @@ from oauthenticator import generic
 
 c = get_config()  # noqa: F821
 
-
+c.NotebookApp.iopub_data_rate_limit=1.0e10
 # ===========================================================================
 #                            General Configuration
 # ===========================================================================
@@ -92,7 +92,10 @@ share_dir = os.environ.get("DOCKER_SHARE_DIR", "/home/jovyan/share")
 
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
-c.DockerSpawner.volumes = {"jupyterhub-user-{username}": notebook_dir}
+c.DockerSpawner.volumes = {
+    "jupyterhub-user-{username}": notebook_dir,
+    "jupyterlab-site-package": "/home/jovyan/.local/lib"
+                           }
 
 if share_dir != "":
     if not os.path.exists(share_dir):

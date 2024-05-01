@@ -45,16 +45,9 @@ function stop_agent() {
          1> ${VERTICA_DATA_DIR}/${VERTICA_DB_NAME}/agent_stop.out
 }
 
-OPT_MC_BIN=/opt/vconsole/bin/mctl
-function start_mc() {
+function get_apikey() {
     echo "Starting Management Console"
-    sudo ${OPT_MC_BIN} start
     cat /opt/vertica/config/apikeys.dat
-}
-
-function stop_mc() {
-    echo "Shutting down Management Console"
-    sudo ${OPT_MC_BIN} stop
 }
 
 

@@ -1,4 +1,0 @@
-pandas[fsspec,s3fs,pyarrow]
-pymysql
-psycopg2-binary
-SQLAlchemy

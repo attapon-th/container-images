@@ -57,9 +57,13 @@ c.DockerSpawner.notebook_dir = "/home/jovyan"
 
 share_dir = os.environ.get("DOCKER_SHARE_DIR", "/home/jovyan/share")
 
+
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
-c.DockerSpawner.volumes = {"jupyterhub-user-{username}": notebook_dir}
+c.DockerSpawner.volumes = {
+    "jupyterhub-user-{username}": notebook_dir,
+    "jupyterlab-site-package": "/home/jovyan/.local/lib"
+                           }
 
 if share_dir != "":
     if not os.path.exists(share_dir):
