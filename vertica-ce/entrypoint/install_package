@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+
+export VERTICA_DB_USER="`whoami`"
+echo VERTICA_DB_USER is \"$VERTICA_DB_USER\"
+VSQL="${VERTICA_OPT_DIR}/bin/vsql -U ${VERTICA_DB_USER}"
+ADMINTOOLS="${VERTICA_OPT_DIR}/bin/admintools"
+
+echo "Reinstalling package"
+${ADMINTOOLS} -t install_package -d ${VERTICA_DB_NAME} -p "${APP_DB_PASSWORD}" -P all --force-reinstall

@@ -5,8 +5,8 @@ version: "3"
 vars:
   DOCKER_REGISTRY: attap0n
   DOCKER_IMAGE: "cronicle"
-  CRONICLE_VERSION: 0.9.40
-  PYTHON_TAG: 3.11.7-bookworm
+  CRONICLE_VERSION: 0.9.51
+  PYTHON_TAG: 3.11-bookworm
 
 tasks:
   default:
@@ -18,6 +18,7 @@ tasks:
   docker-build-python:
     dir: docker
     cmds:
+      - docker pull python:{{.PYTHON_TAG}}
       - |
         docker build \
         --build-arg CRONICLE_VERSION={{.CRONICLE_VERSION}} \
@@ -32,18 +33,18 @@ tasks:
 
   docker-build:
     - task docker-build-python
-    - task docker-build-docker
+    # - task docker-build-docker
 
   docker-scan:
     - docker scan {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
 
   docker-push:
     - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}-py311
-    - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
+    # - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
     - task docker-push-latest
 
   docker-push-latest:
-    - docker tag {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}} {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
+    - docker tag {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}-py311 {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
     - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
 
   t:
