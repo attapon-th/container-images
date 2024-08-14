@@ -5,7 +5,8 @@ version: "3"
 vars:
   DOCKER_REGISTRY: attap0n
   DOCKER_IMAGE: "cronicle"
-  CRONICLE_VERSION: 0.9.51
+  CRONICLE_VERSION:
+    sh: curl https://api.github.com/repos/jhuckaby/Cronicle/releases/latest -s | jq .tag_name -r ||  0.9.51
   PYTHON_TAG: 3.11-bookworm
 
 tasks:
@@ -15,43 +16,23 @@ tasks:
       - task --list-all
     silent: true
 
-  docker-build-python:
-    dir: docker
-    cmds:
-      - docker pull python:{{.PYTHON_TAG}}
-      - |
-        docker build \
-        --build-arg CRONICLE_VERSION={{.CRONICLE_VERSION}} \
-        --build-arg PYTHON_TAG={{.PYTHON_TAG}} \
-        -f python.Dockerfile \
-        -t {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}-py311 \
-        .
-  docker-build-docker:
-    dir: docker
-    cmds:
-      - docker build --build-arg CRONICLE_VERSION={{.CRONICLE_VERSION}} -t {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}} .
+  docker-update:
+    - task docker-build docker-push
 
   docker-build:
-    - task docker-build-python
-    # - task docker-build-docker
-
+    dir: docker
+    cmds:
+      - docker pull docker:latest
+      - |
+        docker build --network=host --no-cache=true \
+        --build-arg CRONICLE_VERSION={{.CRONICLE_VERSION}} \
+        -f docker.Dockerfile \
+        -t {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}} \
+        .
   docker-scan:
     - docker scan {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
 
   docker-push:
-    - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}-py311
-    # - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
-    - task docker-push-latest
-
-  docker-push-latest:
-    - docker tag {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}-py311 {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
+    - docker tag {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}} {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
+    - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:{{.CRONICLE_VERSION}}
     - docker push {{.DOCKER_REGISTRY}}/{{.DOCKER_IMAGE}}:latest
-
-  t:
-    env:
-      WORKER: "true"
-    cmds:
-      - |
-        if [ -z "$WORKER" ]; then
-            echo "None Worker"
-        fi

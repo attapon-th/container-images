@@ -1,23 +1,27 @@
 version: "3.9"
 services:
   vertica:
-    image: vertica/vertica-ce:latest
+    image: attap0n/vertica-ce:24.1.0-0
+    hostname: vertica
     environment:
       APP_DB_USER: "dbadmin"
       APP_DB_PASSWORD: "vertica"
       TZ: "Asia/Bangkok"
     ports:
       - "5433:5433"
-      # - "5444:5444"
+      - "5444:5444"
     deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
+      mode: global
+      # replicas: 1
+      # placement:
+      #   constraints: [node.role == manager]
 
     volumes:
-      - type: volume
-        source: vertica-data2
-        target: /data
+      # - type: volume
+      #   source: vertica-data2
+      #   target: /data
+      - type: bind
+        source: /home/attapon/DockerImages/vertica-ce/entrypoint
+        target: /home/dbadmin/bin
 volumes:
   vertica-data2:

@@ -1,4 +1,4 @@
-FROM       docker:24.0
+FROM       docker:latest
 ARG        CRONICLE_VERSION
 
 LABEL      maintainer="Attapon.TH <https://github.com/attapon-th>"
@@ -13,7 +13,7 @@ ENV        EDITOR=vim
 RUN        apk add --no-cache nodejs npm git curl wget perl bash perl-pathtools tar procps vim tini python3 py3-pip 
 RUN        mkdir -p /opt/cronicle \
     && cd /opt/cronicle \
-    && curl -L https://github.com/jhuckaby/Cronicle/archive/v${CRONICLE_VERSION}.tar.gz | tar zxvf - --strip-components 1 \
+    && curl -L https://github.com/jhuckaby/Cronicle/archive/${CRONICLE_VERSION}.tar.gz | tar zxvf - --strip-components 1 \
     && npm install \
     && node bin/build.js dist \
     && rm -Rf /root/.npm

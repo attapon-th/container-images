@@ -5,7 +5,10 @@ version: "3"
 vars:
   DOCKER_REGISRTY: attap0n
   DOCKER_IMAGE: keycloak
-  DOCKER_TAG: 23.0.3
+  KEYCLAOAK_VERSION:
+    sh: curl https://api.github.com/repos/keycloak/keycloak/releases/latest -s | jq .name -r || 25.0.2
+  DOCKER_TAG: {{.KEYCLAOAK_VERSION}}
+    
 
 tasks:
   default:
@@ -25,6 +28,8 @@ tasks:
         -e KC_HTTP_PORT=8888 \
         {{.DOCKER_REGISRTY}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}  start
 
+  docker-update:
+    - task docker-pull docker-build docker-push
   build:
     - task docker-build
 

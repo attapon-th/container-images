@@ -20,14 +20,24 @@ tasks:
     - docker compose logs -f
   down:
     - docker compose down
+  
+  docker-update:
+    - task docker-build docker-tag docker-push
+
 
   docker-build:
     cmds:
-      - docker build --build-arg VERSION={{.VERSION}} -t attap0n/vertica-ce:{{.VERSION}} .
+      - docker build --network=host --build-arg VERSION={{.VERSION}} -t attap0n/vertica-ce:{{.VERSION}} .
 
   docker-tag:
     - docker tag attap0n/vertica-ce:{{.VERSION}} {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
 
   docker-push:
-    # - docker tag attap0n/vertica-ce:{{.VERSION}} {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
+    - docker tag attap0n/vertica-ce:{{.VERSION}} attap0n/vertica-ce:latest
     - docker push {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
+    - docker push attap0n/vertica-ce:latest
+
+
+  docker-stack:
+    - (docker stack rm vertica && sleep 10s) || echo "not running"
+    - docker stack deploy -c vertica-stack.yml vertica 
