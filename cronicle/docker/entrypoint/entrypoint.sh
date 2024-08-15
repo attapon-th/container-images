@@ -16,11 +16,11 @@ export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
 export CRONICLE_echo=1
 export CRONICLE_foreground=1
 
-if [ ! -d $ROOT_DIR/venv ]
-then
-  python3 -m venv $ROOT_DIR/venv
-fi
-source "$ROOT_DIR/venv/bin/activate"
+# if [ ! -d $ROOT_DIR/venv ]
+# then
+#   python3 -m venv $ROOT_DIR/venv
+# fi
+# source "$ROOT_DIR/venv/bin/activate"
 
 # Only run setup when setup needs to be done
 if [ ! -f $DATA_DIR/.setup_done ]
