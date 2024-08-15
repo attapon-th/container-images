@@ -5,10 +5,9 @@ import docker
 import re
 import functools
 import signal
-from datetime import datetime
 import tomllib
 from typing import Dict, Union, List, Any
-
+from datetime import datetime
 import docker.constants
 
 jsonRegex = re.compile(r"^[\s]*{.*}[\s]*$")
@@ -89,7 +88,6 @@ def main() -> None:
             environment=environment_variables,
             volumes=docker_volumes,
             detach=True,
-            tty=True,
             auto_remove=container_auto_remove,
             **opts,
         )  # type: ignore
@@ -146,10 +144,8 @@ def print_container_logs(container, is_annotate: bool) -> None:
             progress = float(match.group(1)) / 100.0
             print(json.dumps({"progress": progress}))
             continue
-
         if is_annotate:
-            datetime_now = datetime.now().isoformat(timespec="milliseconds")
-            log_line = f"[{datetime_now}] {log_line}"
+            log_line = "[" + datetime.now().isoformat(timespec="microseconds") + "] " + log_line
 
         print(log_line)
 

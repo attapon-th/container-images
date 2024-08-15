@@ -22,6 +22,8 @@ tasks:
   docker-build:
     dir: docker
     cmds:
+      - ./entrypoint/gen_config.py > config/plugins.pixl
+      - defer: rm -f config/plugins.pixl
       - docker pull docker:latest
       - |
         docker build --network=host \

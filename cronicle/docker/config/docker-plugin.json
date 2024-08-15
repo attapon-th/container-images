@@ -1,0 +1,76 @@
+[
+    {
+        "enabled": 1,
+        "title": "Docker Plugin",
+        "command": "/opt/cronicle/bin/docker_plugin.py",
+        "cwd": "",
+        "uid": "",
+        "id": "pydockerplug",
+        "username": "attapon",
+        "modified": 1723703651,
+        "created": 1723625137,
+        "gid": "",
+        "params": [
+            {
+                "type": "text",
+                "id": "image",
+                "title": "The image to run",
+                "size": 40,
+                "value": ""
+            },
+            {
+                "type": "text",
+                "id": "name",
+                "title": "The name for this container",
+                "size": 40,
+                "value": ""
+            },
+            {
+                "type": "text",
+                "id": "cmd",
+                "title": "The command to run in the container",
+                "size": 40,
+                "value": ""
+            },
+            {
+                "type": "checkbox",
+                "id": "annotate",
+                "title": "Add Timestamp to logs",
+                "value": 0
+            },
+            {
+                "type": "checkbox",
+                "id": "repull",
+                "title": "Alway repull image",
+                "value": 0
+            },
+            {
+                "type": "checkbox",
+                "id": "auto_remove",
+                "title": "Enable auto-removal of the container",
+                "value": 1
+            },
+            {
+                "type": "textarea",
+                "id": "environ",
+                "title": "Environment variables (KEY=VALUE, new line separated)",
+                "rows": 10,
+                "value": "TZ=Asia/Bangkok\nPYTHONUNBUFFERED=1\nPYTHONIOENCODING=UTF-8\n"
+            },
+            {
+                "type": "textarea",
+                "id": "volume",
+                "title": "Volumes mounted inside the container",
+                "rows": 3,
+                "value": "# \"/home/user1/:/mnt/vol2\""
+            },
+            {
+                "type": "textarea",
+                "id": "options",
+                "title": "Docker Run More Options (toml file syntax)",
+                "rows": 15,
+                "value": "# can validate a url: https://www.toml-lint.com/\nnetwork = \"\"\nnetwork_mode = \"\" # bridge, host, none\nnetwork_disabled = false\nrestart_policy =   \"\" #  on-failure, or always\nhostname = \"\"\ndomainname =  \"\"\nworking_dir = \"\"\nentrypoint = \"\"\nmem_limit =  \"\" # float or string (100000b, 1000k, 128m, 1g)\ndns = [] # Set custom DNS servers. ex: [\"8.8.8.8\",\"8.8.4.4\"]\n[extra_hosts]\n# example.com = \"123.456.789.0\"\n[labels]\n\"container.labels.runner.with\" = \"cronicle-docker-plugin\"\n[registry] # set docker registry auth\nusername = \"\"\npassword = \"\""
+            }
+        ]
+    }
+]
