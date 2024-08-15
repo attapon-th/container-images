@@ -18,11 +18,15 @@ RUN        mkdir -p /opt/cronicle \
     && node bin/build.js dist \
     && rm -Rf /root/.npm
 
-# Runtime user
-# RUN        adduser cronicle -D -h /opt/cronicle
-# RUN        adduser cronicle docker
+ENV PYTHONUNBUFFERED=1
+RUN  pip3 install --no-cache-dir --upgrade pip --break-system-packages \
+    && pip3 install --no-cache-dir --break-system-packages docker 
+
+
 WORKDIR    /opt/cronicle/
-ADD        entrypoint.sh /entrypoint.sh
+ADD        entrypoint/entrypoint.sh /entrypoint.sh
+ADD        ./plugins/*.py ./bin/
+ADD        config/*.pixl ./import/
 
 EXPOSE     3012
 
