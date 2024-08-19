@@ -31,8 +31,8 @@ def main() -> None:
         docker_image = data["params"]["image"]
         container_name = data["params"]["name"]
         docker_command = data["params"]["cmd"]
-        environment_variables = data["params"]["environ"].splitlines()
-        docker_volumes = data["params"]["volume"].splitlines()
+        environment_variables = [e.strip() for e in data["params"]["environ"].splitlines() if len(e.strip()) > 0]
+        docker_volumes = [e.strip() for e in data["params"]["volume"].splitlines() if len(e.strip()) > 0]
         container_auto_remove = True if data["params"]["auto_remove"] == 1 else False
         is_repull = True if data["params"]["repull"] == 1 else False
         is_annotate = True if data["params"]["annotate"] == 1 else False
@@ -103,6 +103,8 @@ def main() -> None:
             err_msg = container_response.get("Error", {}).get("Message", "Unknown error")
             if code != 0:
                 raise Exception(err_msg)
+            else:
+                err_msg = f"Container {container.name} exited with code {code}."
             print(json.dumps({"complete": 1, "code": code, "description": err_msg}))
         else:
             print('{ "complete": 1 }')
