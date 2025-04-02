@@ -1,0 +1,24 @@
+# command run
+# mkdir -p vertica-mc
+# chown -R 1000:1000 vertica-mc
+# docker compose -f docker-compose-mc.yaml up -d && docker compose -f docker-compose-mc.yaml logs -f
+
+version: "3.9"
+services:
+  vertica-mc:
+    image: cmdac.moph.go.th/vertica-ce-mc:24.1.0-0
+    container_name: vertica-mc
+    hostname: vertica-mc
+    restart: always
+    environment:
+      TZ: "Asia/Bangkok"
+    volumes:
+      - ./data:/home/dbadmin/data
+    networks:
+      - vertica_vertica_net
+      - proxy
+networks:
+  vertica_vertica_net:
+    external: true
+  proxy:
+    external: true

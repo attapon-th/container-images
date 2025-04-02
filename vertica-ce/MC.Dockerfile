@@ -1,6 +1,6 @@
 ARG VERSION=23.4.0-0
 
-FROM vertica/vertica-ce:${VERSION} as builder
+FROM attap0n/vertica-ce:${VERSION} as builder
 
 USER root
 # install vertica console
@@ -12,22 +12,19 @@ RUN rpm -Uvh -i /tmp/$VERTICA_CONSOLE
 RUN sed -i 's/=\/webui/=\/vertica\/webui/' /opt/vconsole/config/console.properties
 
 
-FROM vertica/vertica-ce:${VERSION}
+FROM attap0n/vertica-ce:${VERSION}
 
 ENV TZ=Asia/Bangkok
 
 USER root
-
-ADD ./entrypoint/* /usr/local/bin/
 COPY --from=builder /opt/vconsole /opt/vconsole
-
-RUN chmod +x /usr/local/bin/verticactl \
-    && chmod +x /usr/local/bin/mcctl \
-    && rm /home/dbadmin/docker-entrypoint.sh
 
 USER dbadmin
 
-ENV VERTICA_SCRIPT_PATH=/opt/verticactl MC_SCRIPT_PATH=/opt/mcctl
+COPY --chmod=755 ./entrypoint/mcctl /home/dbadmin/bin/mcctl
+ENV TZ=Asia/Bangkok
+ENV PATH "/home/dbadmin/bin:$PATH"
+ENV ENTRYPOINT_SCRIPT_PATH="/home/dbadmin/bin/mcctl"
 
-ENTRYPOINT "/bin/sh" "-c" "verticactl"
+ENTRYPOINT $ENTRYPOINT_SCRIPT_PATH
 

@@ -16,6 +16,8 @@ COPY --chmod=755 ./entrypoint/install_package /home/dbadmin/bin/install_package
 
 USER dbadmin
 
+ENV TZ=Asia/Bangkok
+ENV PATH "/home/dbadmin/bin:$PATH"
 ENV ENTRYPOINT_SCRIPT_PATH="/home/dbadmin/bin/verticactl"
 
 ENTRYPOINT $ENTRYPOINT_SCRIPT_PATH

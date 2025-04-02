@@ -20,24 +20,45 @@ tasks:
     - docker compose logs -f
   down:
     - docker compose down
-  
+
   docker-update:
     - task docker-build docker-tag docker-push
 
-
+  docker-build-mc:
+    aliases:
+      - dbmc
+    cmds:
+      - |
+        docker build \
+        --network=host \
+        -f MC.Dockerfile \
+        --build-arg VERSION={{.VERSION}} \
+        -t {{.DOCKER_REGISTRY}}/vertica-ce-mc:{{.VERSION}} .
+      - |
+        read -p "Push image? [y/N] " IS_OK
+        test "$IS_OK" = "y" && task docker-push-mc
   docker-build:
     cmds:
-      - docker build --network=host --build-arg VERSION={{.VERSION}} -t attap0n/vertica-ce:{{.VERSION}} .
+      - |
+        docker build \
+        --network=host \
+        --build-arg VERSION={{.VERSION}} \
+        -t {{.DOCKER_REGISTRY}}/vertica-ce:{{.VERSION}} .
+      - |
+        read -p "Push image? [y/N] " IS_OK test "$IS_OK" = "y" \
+        && task docker-push
 
   docker-tag:
-    - docker tag attap0n/vertica-ce:{{.VERSION}} {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
+    - docker tag {{.DOCKER_REGISTRY}}/vertica-ce:{{.VERSION}} {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
+
+  docker-push-mc:
+    - docker push {{.DOCKER_REGISTRY}}/vertica-ce-mc:{{.VERSION}}
 
   docker-push:
-    - docker tag attap0n/vertica-ce:{{.VERSION}} attap0n/vertica-ce:latest
+    - docker tag {{.DOCKER_REGISTRY}}/vertica-ce:{{.VERSION}} attap0n/vertica-ce:latest
     - docker push {{.DOCKER_REGISTRY}}/{{.PROJECT_NAME}}:{{.VERSION}}
-    - docker push attap0n/vertica-ce:latest
-
+    - docker push {{.DOCKER_REGISTRY}}/vertica-ce:latest
 
   docker-stack:
     - (docker stack rm vertica && sleep 10s) || echo "not running"
-    - docker stack deploy -c vertica-stack.yml vertica 
+    - docker stack deploy -c vertica-stack.yml vertica
