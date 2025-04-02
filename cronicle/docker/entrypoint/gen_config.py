@@ -27,6 +27,8 @@ def gen_plugin(plugins):
 def read_plugin():
     files = glob("config/*-plugin.json")
     if len(files) == 0:
+        files: list[str] = glob("docker/config/*-plugin.json")
+    if len(files) == 0:
         raise Exception("No plugin files found")
     plugins = []
     files.sort()
