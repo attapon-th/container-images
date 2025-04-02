@@ -1,6 +1,6 @@
 ARG DOCKER_TAG=latest
 FROM quay.io/keycloak/keycloak:${DOCKER_TAG} as builder
-ARG PREFIX
+ARG PREFIX=/auth
 
 # Enable health and metrics support
 ENV KC_HEALTH_ENABLED=true KC_METRICS_ENABLED=true

@@ -7,8 +7,7 @@ vars:
   DOCKER_IMAGE: keycloak
   KEYCLAOAK_VERSION:
     sh: curl https://api.github.com/repos/keycloak/keycloak/releases/latest -s | jq .name -r || 25.0.2
-  DOCKER_TAG: {{.KEYCLAOAK_VERSION}}
-    
+  DOCKER_TAG: "{{.KEYCLAOAK_VERSION}}"
 
 tasks:
   default:

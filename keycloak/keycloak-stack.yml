@@ -1,6 +1,5 @@
 # ----- ENV -------
-# HOSTNAME=localhost
-# PREFIX_PATH=/auth
+# DOMAIN=localhost
 # DB_USERNAME=keycloak
 # DB_PASSWORD=keycloak
 # DB_NAME=keycloak
@@ -21,21 +20,32 @@ services:
       KC_DB_PASSWORD: ${DB_PASSWORD:-keycloak}
       KEYCLOAK_ADMIN: ${ADMIN_USER:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${ADMIN_PASS:-admin}
-      KC_HOSTNAME_URL: http://${DOMAIN:-localhost:8080}/auth
-      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HOSTNAME_URL: https://${DOMAIN}/auth
+      KC_HTTP_RELATIVE_PATH: /auth # only /auth or /
     command:
       - start
-      - --proxy=edge
-    ports:
-      - target: 8080
-        published: 8080
-        protocol: tcp
-        mode: host
+      - --hostname=https://${DOMAIN}//auth
+      - --proxy-headers=forwarded
+      - --optimized
     deploy:
       mode: replicated
       replicas: 1
+      resources:
+        limits:
+          cpus: "3.0"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.keycloak.tls=true"
+        - "traefik.http.routers.keycloak.entrypoints=websecure"
+        - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN}`) && PathPrefix(`/auth`)"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
     networks:
       - keycloak
+      - proxy
 
   postgres_keycloak:
     image: "postgres:15"
@@ -56,6 +66,8 @@ services:
       - keycloak
 
 networks:
+  proxy:
+    external: true
   keycloak:
 
 volumes:
