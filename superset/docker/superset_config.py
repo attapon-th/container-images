@@ -7,10 +7,11 @@ from security_manager import CustomSecurityManager
 from urllib.request import urlopen, urljoin, quote
 import json
 from cachelib.redis import RedisCache
+
 logger: logging.Logger = logging.getLogger()
 
 SECRET_KEY = os.getenv("SUPERSET_SECRET_KEY")
-
+MAP_TILE = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 FEATURE_FLAGS = {"ALERT_REPORTS": True}
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = False
 
@@ -37,12 +38,12 @@ WTF_CSRF_TIME_LIMIT = 60 * 60 * 24 * 365
 # ===========================================================================
 #                         Database Configuration
 # ===========================================================================
-DATABASE_DIALECT: str = os.getenv("DATABASE_DIALECT", 'postgresql+psycopg2')
-DATABASE_USER: str = os.getenv("DATABASE_USER", 'superset')
-DATABASE_PASSWORD: str = os.getenv("DATABASE_PASSWORD", 'superset')
-DATABASE_HOST: str = os.getenv("DATABASE_HOST", 'db')
-DATABASE_PORT: str = os.getenv("DATABASE_PORT", '5432')
-DATABASE_DB: str = os.getenv("DATABASE_DB", 'superset')
+DATABASE_DIALECT: str = os.getenv("DATABASE_DIALECT", "postgresql+psycopg2")
+DATABASE_USER: str = os.getenv("DATABASE_USER", "superset")
+DATABASE_PASSWORD: str = os.getenv("DATABASE_PASSWORD", "superset")
+DATABASE_HOST: str = os.getenv("DATABASE_HOST", "db")
+DATABASE_PORT: str = os.getenv("DATABASE_PORT", "5432")
+DATABASE_DB: str = os.getenv("DATABASE_DB", "superset")
 
 
 # ===========================================================================
@@ -73,14 +74,8 @@ DATA_CACHE_CONFIG = CACHE_CONFIG
 # 3
 if str(REDIS_RESULTS_BACKEND).isnumeric() is False:
     REDIS_RESULTS_BACKEND = "3"
-    
-RESULTS_BACKEND = RedisCache(
-    host=REDIS_HOST, 
-    port=REDIS_PORT, 
-    key_prefix="superset_be_",
-    default_timeout=86400,
-    db=int(REDIS_RESULTS_BACKEND)
-    )
+
+RESULTS_BACKEND = RedisCache(host=REDIS_HOST, port=REDIS_PORT, key_prefix="superset_be_", default_timeout=86400, db=int(REDIS_RESULTS_BACKEND))
 # {
 #     'CACHE_TYPE': 'RedisCache',
 #     'CACHE_DEFAULT_TIMEOUT': 3600,
@@ -90,17 +85,17 @@ RESULTS_BACKEND = RedisCache(
 
 # 4
 FILTER_STATE_CACHE_CONFIG = {
-    'CACHE_TYPE': 'RedisCache',
-    'CACHE_DEFAULT_TIMEOUT': 86400,  # 1 day
-    'CACHE_KEY_PREFIX': 'superset_fc_',
-    'CACHE_REDIS_URL': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_FILTER_STATE}'
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_DEFAULT_TIMEOUT": 86400,  # 1 day
+    "CACHE_KEY_PREFIX": "superset_fc_",
+    "CACHE_REDIS_URL": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_FILTER_STATE}",
 }
 # 5
 EXPLORE_FORM_DATA_CACHE_CONFIG = {
-    'CACHE_TYPE': 'RedisCache',
-    'CACHE_DEFAULT_TIMEOUT': 86400,  # 1 day
-    'CACHE_KEY_PREFIX': 'superset_fd_',
-    'CACHE_REDIS_URL': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_FORM_DATA}'
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_DEFAULT_TIMEOUT": 86400,  # 1 day
+    "CACHE_KEY_PREFIX": "superset_fd_",
+    "CACHE_REDIS_URL": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_FORM_DATA}",
 }
 
 
@@ -136,9 +131,7 @@ try:
     import superset_config_docker
     from superset_config_docker import *  # noqa
 
-    logger.info(
-        f"Loaded your Docker configuration at " f"[{superset_config_docker.__file__}]"
-    )
+    logger.info(f"Loaded your Docker configuration at " f"[{superset_config_docker.__file__}]")
 except ImportError:
     logger.info("Using default Docker config...")
 
@@ -164,7 +157,7 @@ AUTH_ROLES_MAPPING = {
     "viewer": ["Public"],
     "sql_lab": ["sql_lab"],
 }
-PUBLIC_ROLE_LIKE="Gamma"
+PUBLIC_ROLE_LIKE = "Gamma"
 # AUTH_ROLES_SYNC_AT_LOGIN = False
 AUTH_ROLES_SYNC_AT_LOGIN = True
 AUTH_USER_REGISTRATION = True
@@ -173,18 +166,18 @@ CUSTOM_SECURITY_MANAGER = CustomSecurityManager
 # LOGOUT_REDIRECT_URL = ''
 OAUTH_PROVIDERS = [
     {
-        'name': 'keycloak',
-        'token_key': 'access_token',  # Name of the token in the response of access_token_url
-        'icon': 'fa-key',   # Icon for the provider
-        'remote_app': {
-            'client_id': os.environ.get("KEYCLOAK_CLIENT_ID"),  # Client Id (Identify Superset application)
-            'client_secret': os.environ.get("KEYCLOAK_CLIENT_SECRET"),  # Secret for this Client Id (Identify Superset application)
-            'api_base_url': os.environ.get("KEYCLOAK_ISSUER").rstrip('/') + "/protocol/openid-connect/",
-            'client_kwargs': {
-                'scope': 'openid profile email',
+        "name": "keycloak",
+        "token_key": "access_token",  # Name of the token in the response of access_token_url
+        "icon": "fa-key",  # Icon for the provider
+        "remote_app": {
+            "client_id": os.environ.get("KEYCLOAK_CLIENT_ID"),  # Client Id (Identify Superset application)
+            "client_secret": os.environ.get("KEYCLOAK_CLIENT_SECRET"),  # Secret for this Client Id (Identify Superset application)
+            "api_base_url": os.environ.get("KEYCLOAK_ISSUER").rstrip("/") + "/protocol/openid-connect/",
+            "client_kwargs": {
+                "scope": "openid profile email",
             },
-            'logout_redirect_uri': os.environ.get("KEYCLOAK_LOGOUT_REDIRECT_URL"),
-            'server_metadata_url': os.environ.get("KEYCLOAK_ISSUER").rstrip('/') + '/.well-known/openid-configuration',  # URL to get metadata from
-        }
+            "logout_redirect_uri": os.environ.get("KEYCLOAK_LOGOUT_REDIRECT_URL"),
+            "server_metadata_url": os.environ.get("KEYCLOAK_ISSUER").rstrip("/") + "/.well-known/openid-configuration",  # URL to get metadata from
+        },
     }
 ]
